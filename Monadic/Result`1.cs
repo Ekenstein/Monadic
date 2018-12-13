@@ -8,7 +8,7 @@ namespace Monadic
     /// or a right value of type <see cref="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of the right value.</typeparam>
-    public class ValidationResult<T> : Either<Result, T>
+    public class Result<T> : Either<Result, T>
     {
         /// <summary>
         /// True if the validation was successful, otherwise false.
@@ -27,11 +27,11 @@ namespace Monadic
         /// </summary>
         public Maybe<T> Item => this.MaybeRight<Result, T>();
 
-        private ValidationResult(Result left) : base(left)
+        private Result(Result left) : base(left)
         {
         }
 
-        private ValidationResult(T right) : base(right)
+        private Result(T right) : base(right)
         {
         }
 
@@ -39,22 +39,22 @@ namespace Monadic
         /// Creates a failed validation result containing the given <paramref name="errors"/>.
         /// </summary>
         /// <param name="errors">The errors that occurred during the validation.</param>
-        /// <returns>A <see cref="ValidationResult{T}"/> representing a failed validation.</returns>
-        public static ValidationResult<T> Failed(params Error[] errors) => new ValidationResult<T>(Result.Failed(errors));
+        /// <returns>A <see cref="Result{T}"/> representing a failed validation.</returns>
+        public static Result<T> Failed(params Error[] errors) => new Result<T>(Result.Failed(errors));
 
         /// <summary>
         /// Creates a successful validation result containing the given <paramref name="result"/>.
         /// </summary>
         /// <param name="result">The result of the validation.</param>
-        /// <returns>A <see cref="ValidationResult{T}"/> representing a successful validation result.</returns>
-        public static ValidationResult<T> Success(T result) => new ValidationResult<T>(result);
+        /// <returns>A <see cref="Result{T}"/> representing a successful validation result.</returns>
+        public static Result<T> Success(T result) => new Result<T>(result);
 
-        public static implicit operator ValidationResult<T>(Error error) => Failed(error);
+        public static implicit operator Result<T>(Error error) => Failed(error);
 
-        public static implicit operator ValidationResult<T>(T t) => Success(t);
+        public static implicit operator Result<T>(T t) => Success(t);
 
-        public static implicit operator Result(ValidationResult<T> result) => result.FromLeft(Result.Success);
+        public static implicit operator Result(Result<T> result) => result.FromLeft(Result.Success);
 
-        public static implicit operator Maybe<T>(ValidationResult<T> result) => result.Item;
+        public static implicit operator Maybe<T>(Result<T> result) => result.Item;
     }
 }
