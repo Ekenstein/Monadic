@@ -56,5 +56,9 @@ namespace Monadic
         public static implicit operator Result(Result<T> result) => result.FromLeft(Result.Success);
 
         public static implicit operator Maybe<T>(Result<T> result) => result.Item;
+
+        public override string ToString() => this.FromEither(
+            fromL: l => l.ToString(),
+            fromR: r => $"Success: ({r})");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Monadic
 {
@@ -33,5 +34,9 @@ namespace Monadic
         public static Result Failed(params Error[] errors) => new Result { Succeeded = false, Errors = errors ?? new Error[0]};
 
         public static implicit operator Result(Error error) => Failed(error);
+
+        public override string ToString() => Succeeded
+            ? "Success"
+            : $"Failed: {string.Join(",", Errors.Select(e => e.Code))}";
     }
 }

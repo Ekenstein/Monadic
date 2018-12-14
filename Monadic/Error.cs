@@ -38,5 +38,7 @@ namespace Monadic
             Code = code;
             Description = description;
         }
+
+        public override string ToString() => Code;
     }
 }
