@@ -35,6 +35,11 @@ namespace Monadic.Extensions
             return maybe.IsNothing ? Monadic.Maybe<T2>.Nothing : func(maybe.Value);
         }
 
+        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> transform)
+        {
+            return maybe.Coalesce(t => Monadic.Maybe.Create(transform(t)));
+        }
+
         /// <summary>
         /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
         /// </summary>

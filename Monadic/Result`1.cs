@@ -25,7 +25,7 @@ namespace Monadic
         /// The item of a successful validation result, or <see cref="Maybe{T}.Nothing"/> if the
         /// validation failed.
         /// </summary>
-        public Maybe<T> Item => this.MaybeRight<Result, T>();
+        public Maybe<T> Item => this.MaybeRight();
 
         private Result(Result left) : base(left)
         {
