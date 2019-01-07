@@ -62,15 +62,65 @@ namespace Monadic.Extensions
         public static Maybe<T2> MaybeRight<T1, T2>(this Either<T1, T2> either) => either
             .FromRight(Maybe<T2>.Nothing, Maybe.Just);
 
+        /// <summary>
+        /// Returns the left value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> isn't representing a Left value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <param name="either">The either which the left value should be extracted from.</param>
+        /// <param name="defaultValue">The default value to use if the either isn't representing a left value.</param>
+        /// <returns>
+        /// Either the left value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> is representing a right value.
+        /// </returns>
         public static T1 FromLeft<T1, T2>(this Either<T1, T2> either, T1 defaultValue) => either
             .FromEither(l => l, r => defaultValue);
 
+        /// <summary>
+        /// Returns the right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> isn't representing a Right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <param name="either">The either which the right value should be extracted from.</param>
+        /// <param name="defaultValue">The default value to use if the either isn't representing a right value.</param>
+        /// <returns>
+        /// Either the right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> is representing a left value.
+        /// </returns>
         public static T2 FromRight<T1, T2>(this Either<T1, T2> either, T2 defaultValue) => either
             .FromEither(l => defaultValue, r => r);
 
+        /// <summary>
+        /// Returns a mapped left value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> isn't representing a left value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
+        /// <param name="either">The either which the left value should be extracted and mapped from.</param>
+        /// <param name="defaultValue">The default value to use if the either isn't representing a left value.</param>
+        /// <returns>
+        /// Either the mapped left value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the given <paramref name="either"/> is representing a right value.
+        /// </returns>
         public static T3 FromLeft<T1, T2, T3>(this Either<T1, T2> either, T3 defaultValue, Func<T1, T3> func) => either
             .FromEither(func, right => defaultValue);
 
+        /// <summary>
+        /// Returns a mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> isn't representing a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
+        /// <param name="either">The either which the right value should be extracted and mapped from.</param>
+        /// <param name="defaultValue">The default value to use if the either isn't representing a right value.</param>
+        /// <returns>
+        /// Either the mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the given <paramref name="either"/> is representing a left value.
+        /// </returns>
         public static T3 FromRight<T1, T2, T3>(this Either<T1, T2> either, T3 defaultValue, Func<T2, T3> func) => either
             .FromEither(left => defaultValue, func);
 
@@ -146,6 +196,14 @@ namespace Monadic.Extensions
         public static T1[] Lefts<T1, T2>(this IEnumerable<Either<T1, T2>> eithers) => eithers
             .Partition().lefts;
 
+        /// <summary>
+        /// Extracts from a list of <see cref="Either{T1, T2}"/> all the right elements. All the
+        /// right elements are extracted in order.
+        /// </summary>
+        /// <typeparam name="T1">The left type.</typeparam>
+        /// <typeparam name="T2">The right type.</typeparam>
+        /// <param name="eithers">The list of <see cref="Either{T1, T2}"/>.</param>
+        /// <returns>All the right elements.</returns>
         public static T2[] Rights<T1, T2>(this IEnumerable<Either<T1, T2>> eithers) => eithers
             .Partition().rights;
     }

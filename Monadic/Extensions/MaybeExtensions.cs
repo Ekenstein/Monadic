@@ -6,10 +6,32 @@ namespace Monadic.Extensions
 {
     public static class MaybeExtensions
     {
+        /// <summary>
+        /// Returns either the given <paramref name="defaultValue"/> if the maybe is representing
+        /// nothing, or the value of the <paramref name="maybe"/>.
+        /// </summary>
+        /// <typeparam name="T">The type the maybe is encapsulating.</typeparam>
+        /// <param name="maybe">The maybe containing either nothing or just a value.</param>
+        /// <param name="defaultValue">The default value to return if the maybe is representing nothing.</param>
+        /// <returns>
+        /// Either the given <paramref name="defaultValue"/> if the maybe is representing
+        /// nothing, or the value of the <paramref name="maybe"/>.
+        /// </returns>
         public static T Maybe<T>(this Maybe<T> maybe, T defaultValue) => maybe.IsNothing
             ? defaultValue
             : maybe.Value;
 
+        /// <summary>
+        /// Returns either the result of the given <paramref name="defaultValue"/> if the maybe is representing
+        /// nothing, or the value of the <paramref name="maybe"/>.
+        /// </summary>
+        /// <typeparam name="T">The type the maybe is encapsulating.</typeparam>
+        /// <param name="maybe">The maybe containing either nothing or just a value.</param>
+        /// <param name="defaultValue">The default value to return if the maybe is representing nothing.</param>
+        /// <returns>
+        /// Either the result of the given <paramref name="defaultValue"/> if the maybe is representing
+        /// nothing, or the value of the <paramref name="maybe"/>.
+        /// </returns>
         public static T Maybe<T>(this Maybe<T> maybe, Func<T> defaultValue) => maybe.IsNothing
             ? defaultValue()
             : maybe.Value;
@@ -42,6 +64,8 @@ namespace Monadic.Extensions
 
         /// <summary>
         /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
+        /// If the <paramref name="maybe"/> is representing a Nothing, null will be returned,
+        /// otherwise the value of the <paramref name="maybe"/>.
         /// </summary>
         /// <typeparam name="T">The type of the value the maybe is wrapping.</typeparam>
         /// <param name="maybe">The maybe T or nothing.</param>
