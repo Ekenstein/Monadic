@@ -19,7 +19,7 @@ namespace Monadic
         /// <summary>
         /// Creates an <see cref="Maybe{T}"/> of the given <paramref name="value"/>.
         /// If the value is null, <see cref="Maybe{T}.Nothing"/> is returned, otherwise
-        /// <see cref="Maybe{T}.Just(T)"/>.
+        /// <see cref="Maybe{T}.Just(T)"/> where the value is the extracted value of the given <see cref="Nullable{T}"/>.
         /// </summary>
         /// <typeparam name="T">The type that the Maybe will wrap.</typeparam>
         /// <param name="value">The value that the maybe will wrap.</param>
@@ -46,7 +46,7 @@ namespace Monadic
     /// (represented as Just <see cref="T"/>), or it is empty (represented as Nothing).
     /// </summary>
     /// <typeparam name="T">The type of value the Maybe is wrapping.</typeparam>
-    public struct Maybe<T>
+    public struct Maybe<T> : IEquatable<Maybe<T>>
     {
         private readonly IEnumerable<T> _item;
 
@@ -99,10 +99,19 @@ namespace Monadic
             ? Just(t)
             : Nothing;
 
-        public static implicit operator T(Maybe<T> maybe) => maybe.IsNothing
-            ? default(T)
-            : maybe.Value;
+        public static implicit operator T(Maybe<T> maybe) => maybe.Maybe(default(T));
 
         public override string ToString() => this.FromMaybe("Nothing", v => $"Just ({v})");
+
+        public bool Equals(Maybe<T> other)
+        {
+            if (IsNothing && other.IsNothing) return true;
+            if (IsJust && other.IsJust)
+            {
+                return Equals(Value, other.Value);
+            }
+
+            return false;
+        }
     }
 }
