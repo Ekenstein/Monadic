@@ -21,7 +21,7 @@ namespace Monadic.Extensions
 
         /// <summary>
         /// Ands together the inner <see cref="Result"/> with the
-        /// outer <see cref="Result"/>. If one of the results' are
+        /// outer <see cref="Result"/>. If one or both of the results' are
         /// unsuccessful, an unsuccessful result will be returned
         /// containing the errors of both the results, otherwise
         /// a successful result will be returned.
@@ -51,7 +51,7 @@ namespace Monadic.Extensions
         /// Ors together the inner <see cref="Result"/> with the
         /// outer <see cref="Result"/>. If one of the results are
         /// successful, a successful result will be returned, otherwise
-        /// an unsuccessful will be returned containing the errors of both
+        /// an unsuccessful result will be returned containing the errors of both
         /// results.
         /// </summary>
         /// <param name="self">The inner result.</param>
