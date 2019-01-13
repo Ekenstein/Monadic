@@ -1,7 +1,6 @@
 using Monadic;
 using NUnit.Framework;
 using System;
-using System.Linq;
 
 namespace Tests
 {
@@ -140,6 +139,43 @@ namespace Tests
             var instance2 = Maybe<int>.Nothing;
             AssertNothing(instance2);
             AssertEqual(instance2, default(int));
+        }
+
+        [Test]
+        public void TestEqualsJust()
+        {
+            var instance1 = Maybe.Just(1);
+            var instance2 = Maybe.Just(1);
+
+            Assert.AreEqual(instance1, instance2);
+
+            instance1 = Maybe.Just(2);
+            Assert.AreNotEqual(instance1, instance2);
+        }
+
+        [Test]
+        public void TestEqualsJustReference()
+        {
+            var value = new TestRef();
+
+            var instance1 = Maybe.Just(value);
+            var instance2 = Maybe.Just(value);
+
+            Assert.AreEqual(instance1, instance2);
+
+            var value2 = new TestRef();
+            instance1 = Maybe.Just(value2);
+            
+            Assert.AreNotEqual(instance1, instance2);
+        }
+
+        [Test]
+        public void TestEqualsNothing()
+        {
+            var instance1 = Maybe<int>.Nothing;
+            var instance2 = Maybe<int>.Nothing;
+
+            Assert.AreEqual(instance1, instance2);
         }
 
         private static void AssertEqual<T>(Maybe<T> t1, T t2)

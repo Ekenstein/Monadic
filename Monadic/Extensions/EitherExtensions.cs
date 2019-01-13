@@ -38,27 +38,27 @@ namespace Monadic.Extensions
             either.FromEither(l => throw exception(l), r => r);
 
         /// <summary>
-        /// Returns the left value of the given <paramref name="either"/> or <see cref="Maybe{T}.Nothing"/>
+        /// Returns <see cref="Maybe{T}.Just(T)"/> of the left value or <see cref="Maybe{T}.Nothing"/>
         /// if the <paramref name="either"/> represents a right value.
         /// </summary>
         /// <typeparam name="T1">The type of the left value.</typeparam>
         /// <typeparam name="T2">The type of the right value.</typeparam>
         /// <param name="either">The either to extract the left value from.</param>
         /// <returns>
-        /// The left value of the <paramref name="either"/> or <see cref="Maybe{T}.Nothing"/>
+        /// <see cref="Maybe{T}.Just(T)"/> of the left value or <see cref="Maybe{T}.Nothing"/>
         /// if the <paramref name="either"/> represents a right value.
         /// </returns>
         public static Maybe<T1> MaybeLeft<T1, T2>(this Either<T1, T2> either) => either
             .FromLeft(Maybe<T1>.Nothing, Maybe.Just);
 
         /// <summary>
-        /// Returns the right value of the given <paramref name="either"/> or <see cref="Maybe{T}.Nothing"/>
+        /// Returns the <see cref="Maybe{T}.Just(T)"/> of the right value or <see cref="Maybe{T}.Nothing"/>
         /// if the <paramref name="either"/> represents a left value.
         /// </summary>
         /// <typeparam name="T1">The type of the left value.</typeparam>
         /// <typeparam name="T2">The type of the right value.</typeparam>
         /// <param name="either">The either to extract the right value from.</param>
-        /// <returns>The right value or <see cref="Maybe{T}.Nothing"/> if the either represents a left value.</returns>
+        /// <returns><see cref="Maybe{T}.Just(T)"/> of the right value or <see cref="Maybe{T}.Nothing"/> if the either represents a left value.</returns>
         public static Maybe<T2> MaybeRight<T1, T2>(this Either<T1, T2> either) => either
             .FromRight(Maybe<T2>.Nothing, Maybe.Just);
 
@@ -178,7 +178,7 @@ namespace Monadic.Extensions
                 }
                 else
                 {
-                    seed.Item2.Add(either.Right);
+                    seed.Item2.Add(either.Right);   
                 }
 
                 return seed;

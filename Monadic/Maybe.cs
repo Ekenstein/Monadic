@@ -81,9 +81,10 @@ namespace Monadic
         /// Returns the value the Maybe is representing or throws an <see cref="InvalidOperationException"/>
         /// if the Maybe is representing nothing.
         /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if maybe doesn't contain a value.</exception>
         public T Value => IsJust
             ? _item.Single()
-            : throw new InvalidOperationException();
+            : throw new InvalidOperationException("The Maybe<T> is representing Nothing.");
 
         /// <summary>
         /// True if the Maybe is representing nothing, otherwise false.

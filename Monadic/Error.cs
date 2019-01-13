@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Monadic
 {
@@ -25,12 +27,12 @@ namespace Monadic
         /// <exception cref="ArgumentException">If either code or description are null or white space.</exception>
         public Error(string code, string description)
         {
-            if (string.IsNullOrWhiteSpace(nameof(code)))
+            if (string.IsNullOrWhiteSpace(code))
             {
                 throw new ArgumentException("Code must not be null or white space.");
             }
 
-            if (string.IsNullOrWhiteSpace(nameof(description)))
+            if (string.IsNullOrWhiteSpace(description))
             {
                 throw new ArgumentException("Description must not be null or white space.");
             }

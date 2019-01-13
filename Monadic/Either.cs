@@ -6,20 +6,30 @@ using Monadic.Extensions;
 namespace Monadic
 {
     /// <summary>
-    /// The Either type represents values with two possibilities: a value of type 
-    /// Either <see cref="T1"/> <see cref="T2"/> is either Left <see cref="T1"/> or Right <see cref="T2"/>.
+    /// The Either type represents values with two possibilities: either a left value, or a right value.
+    /// The left value is of the type <typeparamref name="T1"/> and the right value is of the type <typeparamref name="T2"/>.
     /// </summary>
     /// <typeparam name="T1">The left type.</typeparam>
     /// <typeparam name="T2">The right type.</typeparam>
-    public class Either<T1, T2>
+    public class Either<T1, T2> : IEquatable<Either<T1, T2>>
     {
         private readonly IEnumerable<T1> _left;
         private readonly IEnumerable<T2> _right;
 
+        /// <summary>
+        /// Extracts the left value or throws an <see cref="InvalidOperationException"/>
+        /// if the either is representing a right value.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the either is representing a right value.</exception>
         public T1 Left => IsLeft
             ? _left.Single()
             : throw new InvalidOperationException("The Either<T1, T2> doesn't represent a left value.");
 
+        /// <summary>
+        /// Extracts the right value or throws an <see cref="InvalidOperationException"/>
+        /// if the either is representing a left value.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Thrown if the either is representing a left value.</exception>
         public T2 Right => IsRight
             ? _right.Single()
             : throw new InvalidOperationException("The Either<T1, T2> doesn't represent a right value.");
@@ -57,9 +67,18 @@ namespace Monadic
         public static implicit operator Either<T1, T2>(T1 left) => new Either<T1, T2>(left);
         public static implicit operator Either<T1, T2>(T2 right) => new Either<T1, T2>(right);
 
-        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.FromLeft(Maybe<T1>.Nothing, Maybe<T1>.Just);
-        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.FromRight<T1, T2, Maybe<T2>>(Maybe<T2>.Nothing, Maybe<T2>.Just);
+        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.MaybeLeft();
+        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.MaybeRight();
 
         public override string ToString() => this.FromEither(l => $"Left ({l})", r => $"Right ({r})");
+
+        public bool Equals(Either<T1, T2> other)
+        {
+            if (ReferenceEquals(this, other)) return true;
+            if (IsLeft && other.IsLeft) return Equals(Left, other.Left);
+            if (IsRight && other.IsRight) return Equals(Right, other.Right);
+
+            return false;
+        }
     }
 }
