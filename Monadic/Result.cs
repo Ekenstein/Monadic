@@ -45,6 +45,6 @@ namespace Monadic
 
         public override string ToString() => Succeeded
             ? "Success"
-            : $"Failed: {string.Join(",", Errors.Select(e => e.Code))}";
+            : $"Failed: {string.Join(",", Errors)}";
     }
 }
