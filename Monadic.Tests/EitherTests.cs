@@ -6,6 +6,26 @@ namespace Monadic.Tests
     public class EitherTests
     {
         [Test]
+        public void TestRightNull()
+        {
+            TestRef value = null;
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = new Either<string, TestRef>(value);
+            });
+        }
+
+        [Test]
+        public void TestLeftNull()
+        {
+            TestRef value = null;
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = new Either<TestRef, string>(value);
+            });
+        }
+
+        [Test]
         public void TestLeft()
         {
             const int left = 0;

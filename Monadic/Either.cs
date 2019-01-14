@@ -48,8 +48,14 @@ namespace Monadic
         /// Creates an Either representing a <paramref name="left"/> value.
         /// </summary>
         /// <param name="left">The left value.</param>
+        /// <exception cref="ArgumentNullException">If the left value is null.</exception>
         public Either(T1 left)
         {
+            if (left == null)
+            {
+                throw new ArgumentNullException(nameof(left));
+            }
+
             _left = new[] {left};
             _right = new T2[0];
         }
@@ -58,8 +64,14 @@ namespace Monadic
         /// Creates an Either representing a <paramref name="right"/> value.
         /// </summary>
         /// <param name="right">The right value.</param>
+        /// <exception cref="ArgumentNullException">If the right value is null.</exception>
         public Either(T2 right)
         {
+            if (right == null)
+            {
+                throw new ArgumentNullException(nameof(right));
+            }
+
             _left = new T1[0];
             _right = new[] {right};
         }
