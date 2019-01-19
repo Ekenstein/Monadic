@@ -52,15 +52,15 @@ namespace Monadic.Extensions
         public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
             maybe.FromMaybe(new Either<T1, T2>(defaultValue), v => v);
 
-        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> func)
-        {
-            return maybe.IsNothing ? Monadic.Maybe<T2>.Nothing : func(maybe.Value);
-        }
+        /// <summary>
+        /// Performs and returns the value produced by the given <paramref name="func"/> iff the given <paramref name="maybe"/>
+        /// contains a value, otherwise Nothing will be returned.
+        /// </summary>
+        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> func) => maybe
+            .FromMaybe(Monadic.Maybe<T2>.Nothing, func);
 
-        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> transform)
-        {
-            return maybe.Coalesce(t => Monadic.Maybe.Create(transform(t)));
-        }
+        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> transform) => maybe
+            .Coalesce(t => Monadic.Maybe.Create(transform(t)));
 
         /// <summary>
         /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
@@ -75,6 +75,16 @@ namespace Monadic.Extensions
             return maybe.FromMaybe<T, T?>(null, v => v);
         }
 
+        /// <summary>
+        /// Returns a collection of type <typeparamref name="T"/> extracted from the maybes that contains
+        /// a value.
+        /// </summary>
+        /// <typeparam name="T">The type the maybes wrap.</typeparam>
+        /// <param name="maybes">The collection of maybes that will have their values extracted, if a value exists.</param>
+        /// <returns>
+        /// A collection of zero or more values of type <typeparamref name="T"/> that are extracted from the collection of
+        /// maybes where the maybe must contain a value.
+        /// </returns>
         public static IEnumerable<T> CatMaybes<T>(this IEnumerable<Maybe<T>> maybes) => maybes
             .Where(m => m.IsJust)
             .Select(m => m.Value);
