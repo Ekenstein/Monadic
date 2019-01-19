@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Monadic.Extensions;
 
 namespace Monadic
@@ -43,11 +44,12 @@ namespace Monadic
         public static Result<T> Failed(params Error[] errors) => new Result<T>(Result.Failed(errors));
 
         /// <summary>
-        /// Creates a successful validation result containing the given <paramref name="result"/>.
+        /// Creates a successful validation result containing the given <paramref name="item"/>.
         /// </summary>
-        /// <param name="result">The result of the validation.</param>
+        /// <param name="item">The result of the validation.</param>
         /// <returns>A <see cref="Result{T}"/> representing a successful validation result.</returns>
-        public static Result<T> Success(T result) => new Result<T>(result);
+        /// <exception cref="ArgumentNullException">If the given <paramref name="item"/> is null.</exception>
+        public static Result<T> Success(T item) => new Result<T>(item);
 
         public static implicit operator Result<T>(Error error) => Failed(error);
 

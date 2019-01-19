@@ -96,9 +96,7 @@ namespace Monadic
         /// </summary>
         public bool IsJust => !IsNothing;
 
-        public static implicit operator Maybe<T>(T t) => t != null
-            ? Just(t)
-            : Nothing;
+        public static implicit operator Maybe<T>(T t) => Maybe.Create(t);
 
         public static implicit operator T(Maybe<T> maybe) => maybe.Maybe(default(T));
 
@@ -113,6 +111,20 @@ namespace Monadic
             }
 
             return false;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is Maybe<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return IsNothing ? 0 : Value.GetHashCode() * 397;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Monadic
@@ -8,6 +9,15 @@ namespace Monadic
     /// </summary>
     public class Result
     {
+        /// <summary>
+        /// Creates a successful result for the given <paramref name="item"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the item to create successful result for.</typeparam>
+        /// <param name="item">The item that was successful.</param>
+        /// <returns>A successful result containing the given <paramref name="item"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if the given <paramref name="item"/> is null.</exception>
+        public static Result<T> Create<T>(T item) => Result<T>.Success(item);
+
         /// <summary>
         /// Whether the operation was successful or not.
         /// </summary>

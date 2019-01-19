@@ -23,7 +23,7 @@ namespace Monadic.Extensions
         /// Ands together the inner <see cref="Result"/> with the
         /// outer <see cref="Result"/>. If one or both of the results' are
         /// unsuccessful, an unsuccessful result will be returned
-        /// containing the errors of both the results, otherwise
+        /// containing unique errors of both the results, otherwise
         /// a successful result will be returned.
         /// </summary>
         /// <param name="self">The inner result.</param>
@@ -41,7 +41,7 @@ namespace Monadic.Extensions
 
             var errors = self
                 .Errors
-                .Concat(result.Errors)
+                .Union(result.Errors)
                 .ToArray();
 
             return Result.Failed(errors);
@@ -51,7 +51,7 @@ namespace Monadic.Extensions
         /// Ors together the inner <see cref="Result"/> with the
         /// outer <see cref="Result"/>. If one of the results are
         /// successful, a successful result will be returned, otherwise
-        /// an unsuccessful result will be returned containing the errors of both
+        /// an unsuccessful result will be returned containing unique errors of both
         /// results.
         /// </summary>
         /// <param name="self">The inner result.</param>
@@ -69,7 +69,7 @@ namespace Monadic.Extensions
 
             var errors = self
                 .Errors
-                .Concat(outer.Errors)
+                .Union(outer.Errors)
                 .ToArray();
 
             return Result.Failed(errors);
@@ -86,7 +86,7 @@ namespace Monadic.Extensions
         /// The value of the given <paramref name="result"/> iff the result is representing a successful result.
         /// Otherwise the exception produced by the given <paramref name="exception"/> will be thrown.
         /// </returns>
-        public static T OrThrow<T>(this Result<T> result, Func<Result, Exception> exception) => result
-            .RightOrThrow(exception);
+        public static T OrThrow<T>(this Result<T> result, Func<IEnumerable<Error>, Exception> exception) => result
+            .RightOrThrow(l => exception(l.Errors));
     }
 }
