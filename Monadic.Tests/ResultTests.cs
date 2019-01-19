@@ -54,9 +54,8 @@ namespace Monadic.Tests
         public void TestFailedOneErrorNull()
         {
             var error1 = new Error("test1", "testdesc1");
-            Error error2 = null;
 
-            var instance = Result.Failed(error1, error2);
+            var instance = Result.Failed(error1, default(Error));
             AssertFailed(instance, new [] { error1 });
         }
 
@@ -78,8 +77,7 @@ namespace Monadic.Tests
         [Test]
         public void TestFailedImplicitNull()
         {
-            Error error = null;
-            Result instance = error;
+            Result instance = default(Error);
             AssertFailed(instance, new Error[0]);
         }
 

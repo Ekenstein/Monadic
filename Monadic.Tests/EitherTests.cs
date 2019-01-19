@@ -13,6 +13,11 @@ namespace Monadic.Tests
             {
                 var instance = new Either<string, TestRef>(value);
             });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = new Either<string, string>(right: null);
+            });
         }
 
         [Test]
@@ -22,6 +27,11 @@ namespace Monadic.Tests
             Assert.Throws<ArgumentNullException>(() =>
             {
                 var instance = new Either<TestRef, string>(value);
+            });
+
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = new Either<string, string>(left: null);
             });
         }
 
@@ -99,9 +109,6 @@ namespace Monadic.Tests
 
             var value2 = new TestRef();
             instance1 = new Either<int, TestRef>(value2);
-            Assert.AreNotEqual(instance1, instance2);
-
-            instance1 = new Either<int, TestRef>(null);
             Assert.AreNotEqual(instance1, instance2);
 
             var instance3 = new Either<TestRef, TestRef>(left: value);

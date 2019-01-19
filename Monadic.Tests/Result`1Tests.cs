@@ -43,9 +43,8 @@ namespace Monadic.Tests
         [Test]
         public void TestFailedOnErrorNull()
         {
-            Error error1 = null;
             var error2 = new Error("test", "testdesc");
-            var instance = Result<int>.Failed(error1, error2);
+            var instance = Result<int>.Failed(default(Error), error2);
             AssertFailed(instance, new [] { error2 });
         }
 
@@ -56,6 +55,32 @@ namespace Monadic.Tests
         {
             var instance = Result<T>.Success(value);
             AssertSuccess(instance, value);
+        }
+
+        [Test]
+        public void TestSuccessNullValue()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = Result<string>.Success(default(string));
+            });
+        }
+
+        [TestCase(1)]
+        [TestCase(true)]
+        public void TestCreate<T>(T value)
+        {
+            var result = Result.Create(value);
+            AssertSuccess(result, value);
+        }
+
+        [Test]
+        public void TestCreateNullValue()
+        {
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                var instance = Result.Create(default(string));
+            });
         }
 
         private static void AssertFailed<T>(Result<T> instance, IEnumerable<Error> errors)
