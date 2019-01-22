@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Monadic.Extensions
+namespace Monadicsh.Extensions
 {
     public static class ResultExtensions
     {

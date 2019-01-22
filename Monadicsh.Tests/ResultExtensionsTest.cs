@@ -1,10 +1,10 @@
 ﻿using System;
-using Monadic.Extensions;
+using Monadicsh.Extensions;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Monadic.Tests
+namespace Monadicsh.Tests
 {
     public class ResultExtensionsTest
     {

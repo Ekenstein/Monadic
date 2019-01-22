@@ -1,10 +1,9 @@
-using Monadic;
 using NUnit.Framework;
 using System;
 
-namespace Tests
+namespace Monadicsh.Tests
 {
-    public class Tests
+    public class MaybeTests
     {
         [SetUp]
         public void Setup()

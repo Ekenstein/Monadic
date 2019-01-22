@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Monadic.Extensions;
+using Monadicsh.Extensions;
 
-namespace Monadic
+namespace Monadicsh
 {
     /// <summary>
     /// The Either type represents values with two possibilities: either a left value, or a right value.

@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Monadicsh</AssemblyName>
+    <RootNamespace>Monadicsh</RootNamespace>
   </PropertyGroup>
 
 </Project>

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Monadic.Extensions;
+using Monadicsh.Extensions;
 using NUnit.Framework;
 
-namespace Monadic.Tests
+namespace Monadicsh.Tests
 {
     public class MaybeExtensionsTest
     {

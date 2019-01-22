@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Monadic
+namespace Monadicsh
 {
     /// <summary>
     /// A type representing a structured and descriptive error.

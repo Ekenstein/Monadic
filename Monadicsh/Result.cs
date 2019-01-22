@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Monadic
+namespace Monadicsh
 {
     /// <summary>
     /// A type representing a result of an operation.

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Monadic.Tests
+namespace Monadicsh.Tests
 {
     public class TypeParameterizedResultTests
     {

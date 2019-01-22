@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Monadic.Extensions;
+using Monadicsh.Extensions;
 
-namespace Monadic
+namespace Monadicsh
 {
     /// <summary>
     /// A type representing either a <see cref="Result"/>

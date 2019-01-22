@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace Monadic.Tests
+namespace Monadicsh.Tests
 {
     public class EitherTests
     {

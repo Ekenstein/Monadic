@@ -4,6 +4,10 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <AssemblyName>Monadicsh.Tests</AssemblyName>
+
+    <RootNamespace>Monadicsh.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Monadic\Monadic.csproj" />
+    <ProjectReference Include="..\Monadicsh\Monadicsh.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
 
-namespace Monadic.Tests
+namespace Monadicsh.Tests
 {
     public class ResultTests
     {
