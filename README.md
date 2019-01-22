@@ -1,2 +1,2 @@
-# Monadic
-Monadic types in C#
+# Monadicsh
+Monadic-ish types in C#
