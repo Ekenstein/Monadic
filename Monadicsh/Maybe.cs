@@ -100,7 +100,7 @@ namespace Monadicsh
 
         public static implicit operator T(Maybe<T> maybe) => maybe.Or(default(T));
 
-        public override string ToString() => this.FromMaybe("Nothing", v => $"Just ({v})");
+        public override string ToString() => this.Map("Nothing", v => $"Just ({v})");
 
         public bool Equals(Maybe<T> other)
         {

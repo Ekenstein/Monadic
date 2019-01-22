@@ -30,28 +30,62 @@ namespace Monadicsh.Extensions
         /// Either the result of the given <paramref name="defaultValue"/> if the maybe is representing
         /// nothing, or the value of the <paramref name="maybe"/>.
         /// </returns>
-        public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValue) => maybe.FromMaybe(defaultValue, v => v);
+        public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValue) => maybe.Map(defaultValue, v => v);
 
-        public static T2 FromMaybe<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValue, Func<T1, T2> func)
+        /// <summary>
+        /// Returns either the value of the maybe mapped to the new type <typeparamref name="T2"/> or
+        /// the produced default value iff the maybe represents Nothing.
+        /// </summary>
+        /// <typeparam name="T1">The type the maybe is currently wrapping.</typeparam>
+        /// <typeparam name="T2">The type that the value of the maybe should be mapped to.</typeparam>
+        /// <param name="maybe">The maybe containing either a value or Nothing.</param>
+        /// <param name="defaultValue">The function producing the default value if the maybe represents Nothing.</param>
+        /// <param name="map">The function mapping the value of the maybe if the maybe contains a value.</param>
+        /// <returns>
+        /// A value of type <typeparamref name="T2"/> either mapped from the value of the maybe, or the produced
+        /// default value iff the maybe represents Nothing.
+        /// </returns>
+        public static T2 Map<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValue, Func<T1, T2> map)
         {
             return maybe.IsNothing
                 ? defaultValue()
-                : func(maybe.Value);
+                : map(maybe.Value);
         }
 
-        public static T2 FromMaybe<T1, T2>(this Maybe<T1> maybe, T2 defaultValue, Func<T1, T2> func) => maybe
-            .FromMaybe(() => defaultValue, func);
+        /// <summary>
+        /// Returns either the value of the maybe mapped to the new type <typeparamref name="T2"/> or
+        /// the given <paramref name="defaultValue"/> iff the maybe represents Nothing.
+        /// </summary>
+        /// <typeparam name="T1">The type the maybe is currently wrapping.</typeparam>
+        /// <typeparam name="T2">The type that the value of the maybe should be mapped to.</typeparam>
+        /// <param name="maybe">The maybe containing either a value or Nothing.</param>
+        /// <param name="defaultValue">The default value to return if the maybe represents Nothing.</param>
+        /// <param name="map">The function mapping the value of the maybe if the maybe contains a value.</param>
+        /// <returns>
+        /// A value of type <typeparamref name="T2"/> either mapped from the value of the maybe, or the
+        /// given <paramref name="defaultValue"/> iff the maybe represents Nothing.
+        /// </returns>
+        public static T2 Map<T1, T2>(this Maybe<T1> maybe, T2 defaultValue, Func<T1, T2> map) => maybe
+            .Map(() => defaultValue, map);
 
+        /// <summary>
+        /// Returns the value of the given <paramref name="maybe"/> or throws
+        /// the exception produced by the given func iff the maybe represents Nothing.
+        /// </summary>
+        /// <typeparam name="T">The type the maybe is wrapping.</typeparam>
+        /// <param name="maybe">The maybe that either contains a value or nothing.</param>
+        /// <param name="exception">The func producing the exception that will be thrown if the Maybe represents Nothing.</param>
+        /// <returns>The value of the maybe iff the maybe contains a value, otherwise the exception produced by the func will be thrown.</returns>
         public static T OrThrow<T>(this Maybe<T> maybe, Func<Exception> exception) =>
             maybe.Or(() => throw exception());
 
         public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValue) =>
-            maybe.FromMaybe(new Either<T1, T2>(defaultValue()), v => v);
+            maybe.Map(() => new Either<T1, T2>(defaultValue()), v => v);
 
         /// <summary>
-        /// Converts the given <paramref name="maybe"/> to an either where
-        /// the left value is the value of the maybe and the right value is
-        /// the given <paramref name="defaultValue"/>.
+        /// Converts the given <paramref name="maybe"/> to an either that either
+        /// contains the value of the maybe, or the given <paramref name="defaultValue"/> iff
+        /// the maybe represents Nothing.
         /// </summary>
         /// <typeparam name="T1">The type of the left side of the either.</typeparam>
         /// <typeparam name="T2">The type of the right side of the either.</typeparam>
@@ -62,17 +96,17 @@ namespace Monadicsh.Extensions
         /// will contain a right value where the value is the given <paramref name="defaultValue"/>.
         /// </returns>
         public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
-            maybe.FromMaybe(new Either<T1, T2>(defaultValue), v => v);
+            maybe.Either(() => defaultValue);
 
         /// <summary>
         /// Performs and returns the value produced by the given <paramref name="func"/> iff the given <paramref name="maybe"/>
         /// contains a value, otherwise Nothing will be returned.
         /// </summary>
         public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> func) => maybe
-            .FromMaybe(Maybe<T2>.Nothing, func);
+            .Map(() => Maybe<T2>.Nothing, func);
 
-        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> transform) => maybe
-            .Coalesce(t => Maybe.Create(transform(t)));
+        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> func) => maybe
+            .Coalesce(t => Maybe.Create(func(t)));
 
         /// <summary>
         /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
@@ -84,7 +118,7 @@ namespace Monadicsh.Extensions
         /// <returns>A <see cref="Nullable{T}"/> of <see cref="T"/>.</returns>
         public static T? ToNullable<T>(this Maybe<T> maybe) where T : struct
         {
-            return maybe.FromMaybe(default(T?), v => v);
+            return maybe.Map(() => default(T?), v => v);
         }
 
         /// <summary>
@@ -102,6 +136,6 @@ namespace Monadicsh.Extensions
             .Select(m => m.Value);
 
         public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe) => maybe
-            .FromMaybe(Maybe<T>.Nothing, v => v);
+            .Coalesce(v => v);
     }
 }

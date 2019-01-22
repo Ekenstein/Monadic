@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Monadicsh.Extensions;
 using NUnit.Framework;
 
@@ -166,24 +164,46 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestFromMaybe()
+        public void TestMap()
         {
             var instance = Maybe.Just(1);
-            var value = instance.FromMaybe(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            var value = instance.Map(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
             Assert.AreEqual(TimeSpan.FromHours(1), value);
 
-            var value2 = instance.FromMaybe(0, v => v + 1);
+            var value2 = instance.Map(0, v => v + 1);
             Assert.AreEqual(2, value2);
         }
 
         [Test]
-        public void TestFromMaybeDefaultValue()
+        public void TestMapDefaultValue()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.FromMaybe(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            var value = instance.Map(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
             Assert.AreEqual(TimeSpan.FromHours(0), value);
 
-            var value2 = instance.FromMaybe(0, v => v + 1);
+            var value2 = instance.Map(0, v => v + 1);
+            Assert.AreEqual(0, value2);
+        }
+
+        [Test]
+        public void TestMapFunc()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.Map(() => TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            Assert.AreEqual(TimeSpan.FromHours(1), value);
+
+            var value2 = instance.Map(() => 0, v => v + 1);
+            Assert.AreEqual(2, value2);
+        }
+
+        [Test]
+        public void TestMapFuncDefaultValue()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.Map(() => TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            Assert.AreEqual(TimeSpan.FromHours(0), value);
+
+            var value2 = instance.Map(0, v => v + 1);
             Assert.AreEqual(0, value2);
         }
 
