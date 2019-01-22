@@ -17,9 +17,7 @@ namespace Monadic.Extensions
         /// Either the given <paramref name="defaultValue"/> if the maybe is representing
         /// nothing, or the value of the <paramref name="maybe"/>.
         /// </returns>
-        public static T Maybe<T>(this Maybe<T> maybe, T defaultValue) => maybe.IsNothing
-            ? defaultValue
-            : maybe.Value;
+        public static T Or<T>(this Maybe<T> maybe, T defaultValue) => maybe.Or(() => defaultValue);
 
         /// <summary>
         /// Returns either the result of the given <paramref name="defaultValue"/> if the maybe is representing
@@ -32,23 +30,37 @@ namespace Monadic.Extensions
         /// Either the result of the given <paramref name="defaultValue"/> if the maybe is representing
         /// nothing, or the value of the <paramref name="maybe"/>.
         /// </returns>
-        public static T Maybe<T>(this Maybe<T> maybe, Func<T> defaultValue) => maybe.IsNothing
-            ? defaultValue()
-            : maybe.Value;
+        public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValue) => maybe.FromMaybe(defaultValue, v => v);
 
-        public static T2 FromMaybe<T1, T2>(this Maybe<T1> maybe, T2 defaultValue, Func<T1, T2> func)
+        public static T2 FromMaybe<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValue, Func<T1, T2> func)
         {
             return maybe.IsNothing
-                ? defaultValue
+                ? defaultValue()
                 : func(maybe.Value);
         }
 
+        public static T2 FromMaybe<T1, T2>(this Maybe<T1> maybe, T2 defaultValue, Func<T1, T2> func) => maybe
+            .FromMaybe(() => defaultValue, func);
+
         public static T OrThrow<T>(this Maybe<T> maybe, Func<Exception> exception) =>
-            maybe.Maybe(() => throw exception());
+            maybe.Or(() => throw exception());
 
         public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValue) =>
             maybe.FromMaybe(new Either<T1, T2>(defaultValue()), v => v);
 
+        /// <summary>
+        /// Converts the given <paramref name="maybe"/> to an either where
+        /// the left value is the value of the maybe and the right value is
+        /// the given <paramref name="defaultValue"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left side of the either.</typeparam>
+        /// <typeparam name="T2">The type of the right side of the either.</typeparam>
+        /// <param name="maybe">The maybe that may contain a value.</param>
+        /// <param name="defaultValue">The default value to use if the maybe is Nothing.</param>
+        /// <returns>
+        /// An either containing a left value if the maybe has a value, otherwise the either
+        /// will contain a right value where the value is the given <paramref name="defaultValue"/>.
+        /// </returns>
         public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
             maybe.FromMaybe(new Either<T1, T2>(defaultValue), v => v);
 
@@ -57,10 +69,10 @@ namespace Monadic.Extensions
         /// contains a value, otherwise Nothing will be returned.
         /// </summary>
         public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> func) => maybe
-            .FromMaybe(Monadic.Maybe<T2>.Nothing, func);
+            .FromMaybe(Maybe<T2>.Nothing, func);
 
         public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> transform) => maybe
-            .Coalesce(t => Monadic.Maybe.Create(transform(t)));
+            .Coalesce(t => Maybe.Create(transform(t)));
 
         /// <summary>
         /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
@@ -72,7 +84,7 @@ namespace Monadic.Extensions
         /// <returns>A <see cref="Nullable{T}"/> of <see cref="T"/>.</returns>
         public static T? ToNullable<T>(this Maybe<T> maybe) where T : struct
         {
-            return maybe.FromMaybe<T, T?>(null, v => v);
+            return maybe.FromMaybe(default(T?), v => v);
         }
 
         /// <summary>
@@ -88,5 +100,8 @@ namespace Monadic.Extensions
         public static IEnumerable<T> CatMaybes<T>(this IEnumerable<Maybe<T>> maybes) => maybes
             .Where(m => m.IsJust)
             .Select(m => m.Value);
+
+        public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe) => maybe
+            .FromMaybe(Maybe<T>.Nothing, v => v);
     }
 }

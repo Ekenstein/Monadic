@@ -94,21 +94,154 @@ namespace Monadic.Tests
         }
 
         [Test]
-        public void TestCoalesceTypeInferenceJust()
+        public void TestCoalesceTypeInferenceJustValueType()
         {
             var instance = Maybe.Just(1);
             var result = instance.Coalesce(v => v + 1);
             Assert.True(result.IsJust);
             Assert.AreEqual(2, result.Value);
+        }
 
-            var instance2 = Maybe.Just(new TestRef(1));
-            var result2 = instance2.Coalesce(v => v.Value + 1);
-            Assert.True(result2.IsJust);
-            Assert.AreEqual(2, result2.Value);
+        [Test]
+        public void TestCoalesceTypeInferenceJustReferenceType()
+        {
+            var instance = Maybe.Just(new TestRef(1));
+            var result = instance.Coalesce(v => v.Value);
+            Assert.True(result.IsJust);
+            Assert.AreEqual(1, result.Value);
 
-            var result3 = instance2.Coalesce(v => default(TestRef));
-            Assert.False(result3.IsJust);
-            Assert.True(result3.IsNothing);
+            var result2 = instance.Coalesce(v => default(TestRef));
+            Assert.True(result2.IsNothing);
+        }
+
+        [Test]
+        public void TestEither()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.Either(2);
+            Assert.True(value.IsLeft);
+            Assert.AreEqual(1, value.Left);
+        }
+
+        [Test]
+        public void TestEitherRight()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.Either(1);
+            Assert.True(value.IsRight);
+            Assert.AreEqual(1, value.Right);
+        }
+
+        [Test]
+        public void TestEitherFunc()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.Either(() => 2);
+            Assert.True(value.IsLeft);
+            Assert.AreEqual(1, value.Left);
+        }
+
+        [Test]
+        public void TestEitherFuncRight()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.Either(() => 2);
+            Assert.True(value.IsRight);
+            Assert.AreEqual(2, value.Right);
+        }
+
+        [Test]
+        public void TestOrThrow()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.OrThrow(() => new Exception());
+            Assert.AreEqual(1, value);
+        }
+
+        [Test]
+        public void TestOrThrowNothing()
+        {
+            var instance = Maybe<int>.Nothing;
+            Assert.Throws<Exception>(() => instance.OrThrow(() => new Exception()));
+        }
+
+        [Test]
+        public void TestFromMaybe()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.FromMaybe(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            Assert.AreEqual(TimeSpan.FromHours(1), value);
+
+            var value2 = instance.FromMaybe(0, v => v + 1);
+            Assert.AreEqual(2, value2);
+        }
+
+        [Test]
+        public void TestFromMaybeDefaultValue()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.FromMaybe(TimeSpan.FromHours(0), v => TimeSpan.FromHours(v));
+            Assert.AreEqual(TimeSpan.FromHours(0), value);
+
+            var value2 = instance.FromMaybe(0, v => v + 1);
+            Assert.AreEqual(0, value2);
+        }
+
+        [Test]
+        public void TestOr()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.Or(0);
+            Assert.AreEqual(1, value);
+        }
+
+        [Test]
+        public void TestOrNothing()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.Or(10);
+            Assert.AreEqual(10, value);
+        }
+
+        [Test]
+        public void TestOrFunc()
+        {
+            var instance = Maybe.Just(1);
+            var value = instance.Or(() => 0);
+            Assert.AreEqual(1, value);
+        }
+
+        [Test]
+        public void TestOrFuncNothing()
+        {
+            var instance = Maybe<int>.Nothing;
+            var value = instance.Or(() => 10);
+            Assert.AreEqual(10, value);
+        }
+
+        [Test]
+        public void TestFlattenOuterNothing()
+        {
+            var instance = Maybe<Maybe<int>>.Nothing;
+            var result = instance.Flatten();
+            Assert.True(result.IsNothing);
+        }
+
+        [Test]
+        public void TestFlattenInnerNothing()
+        {
+            var instance = Maybe<Maybe<int>>.Just(Maybe<int>.Nothing);
+            var result = instance.Flatten();
+            Assert.True(result.IsNothing);
+        }
+
+        [Test]
+        public void TestFlattenInnerJust()
+        {
+            var instance = Maybe<Maybe<int>>.Just(Maybe.Create(1));
+            var result = instance.Flatten();
+            Assert.True(result.IsJust);
+            Assert.AreEqual(1, result.Value);
         }
 
         private class TestRef
@@ -119,10 +252,6 @@ namespace Monadic.Tests
             }
 
             public int Value { get; }
-        }
-
-        private class TestRef2
-        {
         }
     }
 }
