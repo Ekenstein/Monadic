@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Monadicsh.Extensions;
+using NUnit.Framework;
 using System;
 using System.Linq;
 

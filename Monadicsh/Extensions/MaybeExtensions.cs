@@ -105,21 +105,21 @@ namespace Monadicsh.Extensions
         }
 
         /// <summary>
-        /// Returns an <see cref="Monadicsh.Either{T1, T2}"/> that will either contain
-        /// the value of the given <paramref name="maybe"/>, or the value produced by the given <paramref name="defaultValueSelector"/>
-        /// iff the given <paramref name="maybe"/> represents nothing.
+        /// Returns an <see cref="Monadicsh.Either{T1, T2}"/> representation of the given <paramref name="maybe"/>.
+        /// If the maybe is representing Nothing, the left side will be populated with the value produced with the given <paramref name="defaultValueSelector"/>,
+        /// otherwise the right side will be populated by the value of the maybe.
         /// </summary>
         /// <typeparam name="T1">The type of the value that the maybe is holding and the type the left side of the either will have.</typeparam>
         /// <typeparam name="T2">The type of the value that the right side of the either will have.</typeparam>
         /// <param name="maybe">The maybe that contains either a value or nothing.</param>
         /// <param name="defaultValueSelector">The function producing the default value of type <typeparamref name="T2"/> iff the maybe represents nothing.</param>
         /// <returns>
-        /// An <see cref="Monadicsh.Either{T1, T2}"/> that either contains a left side containing the value
-        /// of the given <paramref name="maybe"/> iff the maybe contains a value, or a right side
-        /// containing the value produced by the given <paramref name="defaultValueSelector"/> iff the maybe represents nothing.
+        /// An <see cref="Monadicsh.Either{T1, T2}"/> representation of the given <paramref name="maybe"/>.
+        /// If the maybe is representing Nothing, the left side will be populated with the value produced by the given <paramref name="defaultValueSelector"/>,
+        /// otherwise the right side will be populated by the value of the maybe.
         /// </returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null.</exception>
-        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValueSelector)
+        /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null or the value produced by the value selector is null.</exception>
+        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, Func<T1> defaultValueSelector)
         {
             if (defaultValueSelector == null)
             {
@@ -130,20 +130,20 @@ namespace Monadicsh.Extensions
         }
 
         /// <summary>
-        /// Returns an <see cref="Monadicsh.Either{T1, T2}"/> that will either contain
-        /// the value of the given <paramref name="maybe"/>, or the given <paramref name="defaultValue"/>.
-        /// iff the given <paramref name="maybe"/> represents nothing.
+        /// Returns an <see cref="Monadicsh.Either{T1, T2}"/> representation of the given <paramref name="maybe"/>.
+        /// If the maybe is representing Nothing, the left side will be populated by the given <paramref name="defaultValue"/>,
+        /// otherwise the right side will be populated by the value of the maybe.
         /// </summary>
         /// <typeparam name="T1">The type of the value that the maybe is holding and the type the left side of the either will have.</typeparam>
         /// <typeparam name="T2">The type of the value that the right side of the either will have.</typeparam>
         /// <param name="maybe">The maybe that contains either a value or nothing.</param>
         /// <param name="defaultValue">The default value to use iff the maybe represents nothing.</param>
         /// <returns>
-        /// An <see cref="Monadicsh.Either{T1, T2}"/> that either contains a left side containing the value
-        /// of the given <paramref name="maybe"/>, or a right side
-        /// containing the given <paramref name="defaultValue"/> iff the maybe represents nothing.
+        /// An <see cref="Monadicsh.Either{T1, T2}"/> representation of the given <paramref name="maybe"/>.
+        /// If the maybe is representing Nothing, the left side will be populated by the given <paramref name="defaultValue"/>,
+        /// otherwise the right side will be populated by the value of the maybe.
         /// </returns>
-        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
+        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, T1 defaultValue) =>
             maybe.ToEither(() => defaultValue);
 
         /// <summary>

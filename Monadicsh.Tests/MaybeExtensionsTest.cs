@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Monadicsh.Extensions;
@@ -112,35 +111,35 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestToEitherLeft()
+        public void TestToEitherRight()
         {
             var instance = Maybe.Just(1);
             var value = instance.ToEither(2);
-            value.AssertLeft(1);
-        }
-
-        [Test]
-        public void TestToEitherRight()
-        {
-            var instance = Maybe<int>.Nothing;
-            var value = instance.ToEither(1);
             value.AssertRight(1);
         }
 
         [Test]
-        public void TestToEitherFuncLeft()
+        public void TestToEitherLeft()
         {
-            var instance = Maybe.Just(1);
-            var value = instance.ToEither(() => 2);
+            var instance = Maybe<int>.Nothing;
+            var value = instance.ToEither(1);
             value.AssertLeft(1);
         }
 
         [Test]
         public void TestToEitherFuncRight()
         {
+            var instance = Maybe.Just(1);
+            var value = instance.ToEither(() => 2);
+            value.AssertRight(1);
+        }
+
+        [Test]
+        public void TestToEitherFuncLeft()
+        {
             var instance = Maybe<int>.Nothing;
             var value = instance.ToEither(() => 2);
-            value.AssertRight(2);
+            value.AssertLeft(2);
         }
 
         [Test]
