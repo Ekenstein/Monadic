@@ -147,23 +147,60 @@ namespace Monadicsh.Extensions
             maybe.ToEither(() => defaultValue);
 
         /// <summary>
-        /// Performs and returns the value produced by the given <paramref name="valueSelector"/> iff the given <paramref name="maybe"/>
-        /// contains a value, otherwise Nothing will be returned.
+        /// Tests the given <paramref name="maybe"/> for Nothing before performing
+        /// the given <paramref name="valueSelector"/>. If the given <paramref name="maybe"/> is Nothing,
+        /// Nothing will be returned, otherwise the <paramref name="valueSelector"/> will be performed and
+        /// returned. Similar to the null-conditional operator (?.).
         /// </summary>
-        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> valueSelector) => maybe
-            .Map(() => Maybe<T2>.Nothing, valueSelector);
+        /// <typeparam name="T1">The type of the value that the maybe is holding.</typeparam>
+        /// <typeparam name="T2">The type of the value that the resulting Maybe will be holding.</typeparam>
+        /// <param name="maybe">The maybe that contains either a value or nothing.</param>
+        /// <param name="valueSelector">The function to be performed and iff the given maybe contains a value.</param>
+        /// <returns>
+        /// Either a Maybe representing Nothing or the maybe returned by the given <paramref name="valueSelector"/>
+        /// produced with the value of the given <paramref name="maybe"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="valueSelector"/> is null.</exception>
+        public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, Maybe<T2>> valueSelector)
+        {
+            if (valueSelector == null)
+            {
+                throw new ArgumentNullException(nameof(valueSelector));
+            }
 
+            return maybe.Map(() => Maybe<T2>.Nothing, valueSelector);
+        }
+
+        /// <summary>
+        /// Tests the given <paramref name="maybe"/> for Nothing before performing
+        /// the given <paramref name="valueSelector"/>. If the given <paramref name="maybe"/> is Nothing,
+        /// Nothing will be returned, otherwise the <paramref name="valueSelector"/> will be performed and
+        /// returned. Similar to the null-conditional operator (?.).
+        /// </summary>
+        /// <typeparam name="T1">The type of the value that the maybe is holding.</typeparam>
+        /// <typeparam name="T2">The type of the value that the resulting Maybe will be holding.</typeparam>
+        /// <param name="maybe">The maybe that contains either a value or nothing.</param>
+        /// <param name="valueSelector">The function to be performed and iff the given maybe contains a value.</param>
+        /// <returns>
+        /// Either a Maybe representing Nothing or a maybe that is created with the returned value of the <paramref name="valueSelector"/>
+        /// produced with the value of the given <paramref name="maybe"/>.
+        /// If the returned value of the given <paramref name="valueSelector"/> is null, Nothing will be returned, otherwise Just.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="valueSelector"/> is null.</exception>
         public static Maybe<T2> Coalesce<T1, T2>(this Maybe<T1> maybe, Func<T1, T2> valueSelector) => maybe
             .Coalesce(t => Maybe.Create(valueSelector(t)));
 
         /// <summary>
-        /// Converts the given <paramref name="maybe"/> to a <see cref="Nullable{T}"/>.
-        /// If the <paramref name="maybe"/> is representing a Nothing, null will be returned,
-        /// otherwise the value of the <paramref name="maybe"/>.
+        /// Returns a <see cref="Nullable{T}"/> representation of the given <paramref name="maybe"/>
+        /// where the value will be null if the given <paramref name="maybe"/> is Nothing, otherwise
+        /// a non-null value will be returned.
         /// </summary>
         /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
         /// <param name="maybe">The maybe that contains either a value or nothing.</param>
-        /// <returns>A <see cref="Nullable{T}"/> of type <typeparamref name="T"/>.</returns>
+        /// <returns>
+        /// A <see cref="Nullable{T}"/> of type <typeparamref name="T"/> which will be null
+        /// if the given <paramref name="maybe"/> is Nothing, otherwise a non-null value.
+        /// </returns>
         public static T? ToNullable<T>(this Maybe<T> maybe) where T : struct
         {
             return maybe.Map(() => default(T?), v => v);
@@ -267,7 +304,15 @@ namespace Monadicsh.Extensions
             return maybe.Map(() => false, v => equalityComparer.Equals(v, valueSelector()));
         }
 
-        public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe) => maybe
-            .Coalesce(v => v);
+        /// <summary>
+        /// Flattens the given <paramref name="maybe"/>. If the given <paramref name="maybe"/> is Nothing,
+        /// Nothing will be returned, otherwise the inner <see cref="Maybe{T}"/> will be returned.
+        /// </summary>
+        /// <typeparam name="T">The type of the value that the inner maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe that is holding either Nothing or another <see cref="Maybe{T}"/>.</param>
+        /// <returns>
+        /// Either Nothing if the given <paramref name="maybe"/> is Nothing, or the inner <paramref name="maybe"/>.
+        /// </returns>
+        public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe) => maybe.Coalesce(v => v);
     }
 }
