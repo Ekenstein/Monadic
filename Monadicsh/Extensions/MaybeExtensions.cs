@@ -119,7 +119,7 @@ namespace Monadicsh.Extensions
         /// containing the value produced by the given <paramref name="defaultValueSelector"/> iff the maybe represents nothing.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null.</exception>
-        public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValueSelector)
+        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValueSelector)
         {
             if (defaultValueSelector == null)
             {
@@ -143,8 +143,8 @@ namespace Monadicsh.Extensions
         /// of the given <paramref name="maybe"/>, or a right side
         /// containing the given <paramref name="defaultValue"/> iff the maybe represents nothing.
         /// </returns>
-        public static Either<T1, T2> Either<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
-            maybe.Either(() => defaultValue);
+        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T1> maybe, T2 defaultValue) =>
+            maybe.ToEither(() => defaultValue);
 
         /// <summary>
         /// Performs and returns the value produced by the given <paramref name="valueSelector"/> iff the given <paramref name="maybe"/>

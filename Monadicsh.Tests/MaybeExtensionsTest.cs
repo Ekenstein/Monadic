@@ -112,39 +112,35 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestEither()
+        public void TestToEitherLeft()
         {
             var instance = Maybe.Just(1);
-            var value = instance.Either(2);
-            Assert.True(value.IsLeft);
-            Assert.AreEqual(1, value.Left);
+            var value = instance.ToEither(2);
+            value.AssertLeft(1);
         }
 
         [Test]
-        public void TestEitherRight()
+        public void TestToEitherRight()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.Either(1);
-            Assert.True(value.IsRight);
-            Assert.AreEqual(1, value.Right);
+            var value = instance.ToEither(1);
+            value.AssertRight(1);
         }
 
         [Test]
-        public void TestEitherFunc()
+        public void TestToEitherFuncLeft()
         {
             var instance = Maybe.Just(1);
-            var value = instance.Either(() => 2);
-            Assert.True(value.IsLeft);
-            Assert.AreEqual(1, value.Left);
+            var value = instance.ToEither(() => 2);
+            value.AssertLeft(1);
         }
 
         [Test]
-        public void TestEitherFuncRight()
+        public void TestToEitherFuncRight()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.Either(() => 2);
-            Assert.True(value.IsRight);
-            Assert.AreEqual(2, value.Right);
+            var value = instance.ToEither(() => 2);
+            value.AssertRight(2);
         }
 
         [Test]
