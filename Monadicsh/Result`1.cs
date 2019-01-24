@@ -20,7 +20,7 @@ namespace Monadicsh
         /// A list of errors from the validation or an empty list if there were
         /// no validation errors.
         /// </summary>
-        public IReadOnlyList<Error> Errors => this.FromLeft(new Error[0], result => result.Errors);
+        public IReadOnlyList<Error> Errors => this.MapLeft(new Error[0], result => result.Errors);
 
         /// <summary>
         /// The item of a successful validation result, or <see cref="Maybe{T}.Nothing"/> if the

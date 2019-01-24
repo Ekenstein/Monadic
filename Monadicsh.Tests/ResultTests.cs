@@ -9,22 +9,27 @@ namespace Monadicsh.Tests
         public void TestSuccess()
         {
             var instance = Result.Success;
-            AssertSuccess(instance);
+            instance.AssertSuccess();
         }
 
         [Test]
         public void TestFailedNoErrors()
         {
             var instance = Result.Failed();
-            AssertFailed(instance, new Error[0]);
+            instance.AssertFailed(new Error[0]);
         }
 
         [Test]
         public void TestFailedOneError()
         {
-            var error = new Error("test", "testing");
+            var error = new Error
+            {
+                Code = "test",
+                Description = "testing"
+            };
+
             var instance = Result.Failed(error);
-            AssertFailed(instance, new [] { error });
+            instance.AssertFailed(new[] { error });
         }
 
         [Test]
@@ -32,67 +37,79 @@ namespace Monadicsh.Tests
         {
             var errors = new []
             {
-                new Error("test1", "testdesc1"),
-                new Error("test2", "testdesc2")
+                new Error
+                {
+                    Code = "test1",
+                    Description = "testdesc1"
+                },
+                new Error
+                {
+                    Code = "test2",
+                    Description = "testdesc2"
+                }
             };
 
             var instance = Result.Failed(errors);
-            AssertFailed(instance, errors);
+            instance.AssertFailed(errors);
         }
 
         [Test]
         public void TestFailedParamsError()
         {
-            var error1 = new Error("test1", "testdesc1");
-            var error2 = new Error("test2", "testdesc2");
+            var error1 = new Error
+            {
+                Code = "test1", 
+                Description = "testdesc1"
+            };
+
+            var error2 = new Error
+            {
+                Code = "test2",
+                Description = "testdesc2"
+            };
 
             var instance = Result.Failed(error1, error2);
-            AssertFailed(instance, new [] { error1, error2});
+            instance.AssertFailed(new [] { error1, error2 });
         }
 
         [Test]
         public void TestFailedOneErrorNull()
         {
-            var error1 = new Error("test1", "testdesc1");
+            var error1 = new Error 
+            {
+                Code = "test1",
+                Description = "testdesc1"
+            };
 
             var instance = Result.Failed(error1, default(Error));
-            AssertFailed(instance, new [] { error1 });
+            instance.AssertFailed(new [] { error1 });
         }
 
         [Test]
         public void TestFailedErrorsNull()
         {
             var instance = Result.Failed(null);
-            AssertFailed(instance, new Error[0]);
+            instance.AssertFailed(new Error[0]);
         }
 
         [Test]
         public void TestFailedImplicit()
         {
-            var error = new Error("test", "testdesc");
+            var error = new Error 
+            {
+                Code = "test",
+                Description = "testdesc"
+            };
+
             Result instance = error;
-            AssertFailed(instance, new [] { error });
+            instance.AssertFailed(new [] { error });
         }
 
         [Test]
         public void TestFailedImplicitNull()
         {
             Result instance = default(Error);
-            AssertFailed(instance, new Error[0]);
-        }
-
-        private static void AssertFailed(Result instance, IEnumerable<Error> errors)
-        {
-            Assert.False(instance.Succeeded);
-            Assert.IsNotNull(instance.Errors);
-            Assert.That(errors, Is.EquivalentTo(instance.Errors));
-        }
-
-        private static void AssertSuccess(Result instance)
-        {
-            Assert.True(instance.Succeeded);
-            Assert.IsNotNull(instance.Errors);
-            Assert.IsEmpty(instance.Errors);
+            instance.AssertFailed(new Error[0]);
         }
     }
 }

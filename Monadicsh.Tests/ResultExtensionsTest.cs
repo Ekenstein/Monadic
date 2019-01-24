@@ -11,22 +11,39 @@ namespace Monadicsh.Tests
         private static IEnumerable<(Result, Result)> ResultsThatAreAllFailed()
         {
             yield return (Result.Failed(), Result.Failed());
-            yield return (Result.Failed(new Error("test1", "test1")), Result.Failed(new Error("test2", "test2")));
-            yield return (Result.Failed(new Error("test1", "test1")), Result.Failed());
-            yield return (Result.Failed(), Result.Failed(new Error("test2", "test2")));
+            yield return (Result.Failed(new Error { Code = "test1", Description = "test1" }), 
+                Result.Failed(new Error 
+                {
+                    Code = "test2",
+                    Description = "test2"
+                }));
+            yield return (Result.Failed(new Error 
+            {
+                Code = "test",
+                Description = "test"
+            }), Result.Failed());
+            yield return (Result.Failed(), Result.Failed(new Error
+            {
+                Code = "test",
+                Description = "test"
+            }));
         }
 
         private static IEnumerable<(Result, Result)> ResultThatAreSuccessOrMixed()
         {
             yield return (Result.Failed(), Result.Success);
-            yield return (Result.Failed(new Error("test1", "test1")), Result.Success);
+            yield return (Result.Failed(new Error 
+            {
+                Code = "test1",
+                Description = "test1"
+            }), Result.Success);
             yield return (Result.Success, Result.Success);
         }
 
         private static IEnumerable<(Result, Result)> ResultsThatAreMixed()
         {
             yield return (Result.Failed(), Result.Success);
-            yield return (Result.Failed(new Error("test1", "test1")), Result.Success);
+            yield return (Result.Failed(new Error { Code = "test1", Description = "test1" }), Result.Success);
         }
 
         private static IEnumerable<(Result, Result)> ResultsThatAreAllSuccessful()
@@ -37,16 +54,7 @@ namespace Monadicsh.Tests
         private static void AssertFailed((Result, Result) values, Result result)
         {
             var expectedErrors = values.Item1.Errors.Union(values.Item2.Errors);
-            Assert.False(result.Succeeded);
-            Assert.IsNotNull(result.Errors);
-            Assert.That(expectedErrors, Is.EquivalentTo(result.Errors));
-        }
-
-        private static void AssertSuccess(Result result)
-        {
-            Assert.True(result.Succeeded);
-            Assert.IsNotNull(result.Errors);
-            Assert.IsEmpty(result.Errors);
+            result.AssertFailed(expectedErrors);
         }
 
         [TestCaseSource(nameof(ResultsThatAreAllFailed))]
@@ -66,10 +74,10 @@ namespace Monadicsh.Tests
         public void TestOrSuccess((Result, Result) testCase)
         {
             var result = testCase.Item1.Or(testCase.Item2);
-            AssertSuccess(result);
+            result.AssertSuccess();
 
             result = testCase.Item2.Or(testCase.Item1);
-            AssertSuccess(result);
+            result.AssertSuccess();
         }
 
         [TestCaseSource(nameof(ResultsThatAreMixed))]
@@ -86,10 +94,10 @@ namespace Monadicsh.Tests
         public void TestAndSuccess((Result, Result) testCase)
         {
             var result = testCase.Item1.And(testCase.Item2);
-            AssertSuccess(result);
+            result.AssertSuccess();
 
             result = testCase.Item2.And(testCase.Item1);
-            AssertSuccess(result);
+            result.AssertSuccess();
         }
 
         [Test]
@@ -111,7 +119,11 @@ namespace Monadicsh.Tests
                 });
             });
 
-            var error = new Error("test", "test");
+            var error = new Error 
+            {
+                Code = "test1",
+                Description = "test1"
+            };
             instance = Result.Failed(error);
 
             Assert.Throws<Exception>(() =>
@@ -139,7 +151,7 @@ namespace Monadicsh.Tests
         [Test]
         public void TestOrThrowFailed()
         {
-            var error = new Error("test", "test");
+            var error = new Error { Code = "test", Description = "test"};
             var instance = Result<int>.Failed(error);
             Assert.Throws<Exception>(() =>
             {

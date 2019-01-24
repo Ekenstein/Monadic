@@ -40,10 +40,10 @@ namespace Monadicsh.Tests
         {
             const int left = 0;
             var instance = new Either<int, string>(left);
-            AssertLeft(instance, 0);
+            instance.AssertLeft(0);
 
             var instance2 = new Either<int, int>(left: left);
-            AssertLeft(instance2, left);
+            instance.AssertLeft(left);
         }
 
         [Test]
@@ -51,10 +51,10 @@ namespace Monadicsh.Tests
         {
             const string right = "test";
             var instance = new Either<int, string>(right);
-            AssertRight(instance, right);
+            instance.AssertRight(right);
 
             var instance2 = new Either<string, string>(right: right);
-            AssertRight(instance2, right);
+            instance.AssertRight(right);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace Monadicsh.Tests
         {
             const int left = 1;
             Either<int, string> instance = left;
-            AssertLeft(instance, left);
+            instance.AssertLeft(left);
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace Monadicsh.Tests
         {
             const string right = "test";
             Either<int, string> instance = right;
-            AssertRight(instance, right);
+            instance.AssertRight(right);
         }
         
         [Test]
@@ -115,30 +115,6 @@ namespace Monadicsh.Tests
             var instance4 = new Either<TestRef, TestRef>(right: value);
 
             Assert.AreNotEqual(instance3, instance4);
-        }
-
-        private void AssertRight<T1, T2>(Either<T1, T2> instance, T2 value)
-        {
-            Assert.True(instance.IsRight);
-            Assert.False(instance.IsLeft);
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                var left = instance.Left;
-            });
-
-            Assert.AreEqual(instance.Right, value);
-        }
-
-        private void AssertLeft<T1, T2>(Either<T1, T2> instance, T1 value)
-        {
-            Assert.True(instance.IsLeft);
-            Assert.False(instance.IsRight);
-            Assert.Throws<InvalidOperationException>(() =>
-            {
-                var right = instance.Right;
-            });
-            
-            Assert.AreEqual(instance.Left, value);
         }
 
         private class TestRef { }

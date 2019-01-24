@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Monadicsh.Extensions;
 using NUnit.Framework;
@@ -8,7 +10,7 @@ namespace Monadicsh.Tests
     public class MaybeExtensionsTest
     {
         [Test]
-        public void TestCatMaybesMixed()
+        public void TestJustMixed()
         {
             var maybes = new[]
             {
@@ -16,13 +18,13 @@ namespace Monadicsh.Tests
                 Maybe<int>.Nothing
             };
 
-            var result = maybes.CatMaybes().ToArray();
+            var result = maybes.Just().ToArray();
             Assert.AreEqual(1, result.Length);
             Assert.Contains(1, result);
         }
 
         [Test]
-        public void TestCatMaybesAllNothing()
+        public void TestJustAllNothing()
         {
             var maybes = new[]
             {
@@ -30,12 +32,12 @@ namespace Monadicsh.Tests
                 Maybe<int>.Nothing
             };
 
-            var result = maybes.CatMaybes().ToArray();
+            var result = maybes.Just().ToArray();
             Assert.IsEmpty(result);
         }
 
         [Test]
-        public void TestCatMaybesAllJust()
+        public void TestJustAllJust()
         {
             var maybes = new[]
             {
@@ -43,17 +45,17 @@ namespace Monadicsh.Tests
                 Maybe.Create(2)
             };
 
-            var result = maybes.CatMaybes().ToArray();
+            var result = maybes.Just().ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.Contains(1, result);
             Assert.Contains(2, result);
         }
 
         [Test]
-        public void TestCatMaybesEmpty()
+        public void TestJustEmpty()
         {
             var maybes = new Maybe<int>[0];
-            var result = maybes.CatMaybes().ToArray();
+            var result = maybes.Just().ToArray();
             Assert.IsEmpty(result);
         }
 
@@ -79,8 +81,7 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe.Just(1);
             var result = instance.Coalesce(v => Maybe.Just(v + 1));
-            Assert.True(result.IsJust);
-            Assert.AreEqual(2, result.Value);
+            result.AssertJust(2);
         }
 
         [Test]
@@ -88,7 +89,7 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe<int>.Nothing;
             var result = instance.Coalesce(v => Maybe.Just(v + 1));
-            Assert.False(result.IsJust);
+            result.AssertNothing();
         }
 
         [Test]
@@ -96,8 +97,7 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe.Just(1);
             var result = instance.Coalesce(v => v + 1);
-            Assert.True(result.IsJust);
-            Assert.AreEqual(2, result.Value);
+            result.AssertJust(2);
         }
 
         [Test]
@@ -105,11 +105,10 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe.Just(new TestRef(1));
             var result = instance.Coalesce(v => v.Value);
-            Assert.True(result.IsJust);
-            Assert.AreEqual(1, result.Value);
+            result.AssertJust(1);
 
             var result2 = instance.Coalesce(v => default(TestRef));
-            Assert.True(result2.IsNothing);
+            result2.AssertNothing();
         }
 
         [Test]
@@ -244,7 +243,7 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe<Maybe<int>>.Nothing;
             var result = instance.Flatten();
-            Assert.True(result.IsNothing);
+            result.AssertNothing();
         }
 
         [Test]
@@ -252,7 +251,7 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe<Maybe<int>>.Just(Maybe<int>.Nothing);
             var result = instance.Flatten();
-            Assert.True(result.IsNothing);
+            result.AssertNothing();
         }
 
         [Test]
@@ -260,8 +259,53 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe<Maybe<int>>.Just(Maybe.Create(1));
             var result = instance.Flatten();
-            Assert.True(result.IsJust);
-            Assert.AreEqual(1, result.Value);
+            result.AssertJust(1);
+        }
+
+        [Test]
+        public void TestIs()
+        {
+            var instance = Maybe.Just(1);
+            Assert.True(instance.Is(1));
+            Assert.False(instance.Is(2));
+
+            Assert.True(instance.Is(() => 1));
+            Assert.False(instance.Is(() => 2));
+           
+            Assert.Throws<ArgumentNullException>(() => instance.Is(default(Func<int>)));
+
+            instance = Maybe<int>.Nothing;
+            Assert.False(instance.Is(1));
+            Assert.False(instance.Is(() => 1));
+
+            var instance2 = Maybe<string>.Just("test");
+            Assert.False(instance2.Is(default(string)));
+            Assert.False(instance2.Is(() => default(string)));
+            Assert.True(instance2.Is(() => "test"));
+            Assert.True(instance2.Is("test"));
+        }
+
+        [Test]
+        public void TestIsEqualityComparer()
+        {
+            var instance = Maybe.Just("test");
+            var equalityComparer = new TestEqualityComparer();
+            Assert.True(instance.Is("test", equalityComparer));
+            Assert.False(instance.Is("notTest", equalityComparer));
+
+            Assert.Throws<ArgumentNullException>(() => instance.Is("test", null));
+            Assert.Throws<ArgumentNullException>(() => instance.Is(default(Func<string>), equalityComparer));
+            Assert.Throws<ArgumentNullException>(() => instance.Is(default(Func<string>), null));
+
+            Assert.True(instance.Is(() => "test", equalityComparer));
+            Assert.False(instance.Is(() => "notTest", equalityComparer));
+        }
+
+        private class TestEqualityComparer : IEqualityComparer<string>
+        {
+            public bool Equals(string x, string y) => string.Equals(x, y);
+
+            public int GetHashCode(string obj) => obj?.GetHashCode() ?? 0;
         }
 
         private class TestRef

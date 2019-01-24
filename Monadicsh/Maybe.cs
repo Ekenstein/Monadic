@@ -39,6 +39,20 @@ namespace Monadicsh
         {
             return t == null ? Maybe<T>.Nothing : Just(t);
         }
+
+        /// <summary>
+        /// Creates an <see cref="Maybe{T}"/> of the given string <paramref name="s"/>.
+        /// If the string is null or white space, Nothing will be returned, otherwise
+        /// Just <paramref name="s"/>.
+        /// </summary>
+        /// <param name="s">The string to create a maybe.</param>
+        /// <returns>
+        /// Either Nothing if the string is null or white space, or Just <paramref name="s"/> if
+        /// the string is non empty.
+        /// </returns>
+        public static Maybe<string> CreateNonEmpty(string s) => string.IsNullOrWhiteSpace(s)
+            ? Maybe<string>.Nothing
+            : Maybe.Just(s);
     }
 
     /// <summary>

@@ -32,24 +32,24 @@ namespace Monadicsh.Tests
         public void TestJust<T>(T value)
         {
             var instance = Maybe<T>.Just(value);
-            AssertJust(instance, value);
+            instance.AssertJust(value);
         }
         
         [Test]
         public void TestNothing()
         {
             var instance = Maybe<TestRef>.Nothing;
-            AssertNothing(instance);
+            instance.AssertNothing();
 
             var instance2 = Maybe<int>.Nothing;
-            AssertNothing(instance);
+            instance2.AssertNothing();
         }
 
         [Test]
         public void TestDefaultValue()
         {
             var instance = default(Maybe<int>);
-            AssertNothing(instance);
+            instance.AssertNothing();
         }
 
         [Test]
@@ -57,11 +57,11 @@ namespace Monadicsh.Tests
         {
             var value = (bool?)true;
             var instance = Maybe.Create(value);
-            AssertJust(instance, (bool)value);
+            instance.AssertJust((bool)value);
             
             value = null;
             instance = Maybe.Create(value);
-            AssertNothing(instance);
+            instance.AssertNothing();
         }
 
         [Test]
@@ -69,11 +69,11 @@ namespace Monadicsh.Tests
         {
             var value = new TestRef();
             var instance = Maybe.Create(value);
-            AssertJust(instance, value);
+            instance.AssertJust(value);
 
             value = null;
             instance = Maybe.Create(value);
-            AssertNothing(instance);
+            instance.AssertNothing();
         }
 
         [TestCase(default(bool))]
@@ -81,7 +81,7 @@ namespace Monadicsh.Tests
         public void TestCreateDefaultValues<T>(T value)
         {
             var instance = Maybe.Create(value);
-            AssertJust(instance, value);
+            instance.AssertJust(value);
         }
 
         [TestCase(default(bool))]
@@ -90,7 +90,7 @@ namespace Monadicsh.Tests
         public void TestTypeInferredJust<T>(T value)
         {
             var instance = Maybe.Just(value);
-            AssertJust(instance, value);
+            instance.AssertJust(value);
         }
 
         [Test]
@@ -108,14 +108,14 @@ namespace Monadicsh.Tests
         public void TestImplicitCreateMaybe<T>(T value)
         {
             Maybe<T> instance = value;
-            AssertJust(instance, value);
+            instance.AssertJust(value);
         }
 
         [Test]
         public void TestImplicitCreateMaybeNull()
         {
             Maybe<TestRef> instance = null;
-            AssertNothing(instance);
+            instance.AssertNothing();
         }
 
         [TestCase(default(int))]
@@ -124,7 +124,7 @@ namespace Monadicsh.Tests
         public void TestImplicitFromMaybe<T>(T value)
         {
             Maybe<T> instance = value;
-            AssertJust(instance, value);
+            instance.AssertJust(value);
             AssertEqual(instance, value);
         }
 
@@ -132,11 +132,11 @@ namespace Monadicsh.Tests
         public void TestImplicitFromMaybeNull()
         {
             Maybe<TestRef> instance = null;
-            AssertNothing(instance);
+            instance.AssertNothing();
             AssertEqual(instance, default(TestRef));
 
             var instance2 = Maybe<int>.Nothing;
-            AssertNothing(instance2);
+            instance2.AssertNothing();
             AssertEqual(instance2, default(int));
         }
 
@@ -177,26 +177,29 @@ namespace Monadicsh.Tests
             Assert.AreEqual(instance1, instance2);
         }
 
+        [Test]
+        public void TestCreateNonEmpty()
+        {
+            var instance = Maybe.CreateNonEmpty("test");
+            instance.AssertJust("test");
+        }
+
+        [Test]
+        public void TestCreateNonEmptyNothing()
+        {
+            var instance = Maybe.CreateNonEmpty("");
+            instance.AssertNothing();
+
+            instance = Maybe.CreateNonEmpty(null);
+            instance.AssertNothing();
+
+            instance = Maybe.CreateNonEmpty(" ");
+            instance.AssertNothing();
+        }
+
         private static void AssertEqual<T>(Maybe<T> t1, T t2)
         {
             Assert.AreEqual((T)t1, t2);
-        }
-
-        private static void AssertNothing<T>(Maybe<T> instance)
-        {
-            Assert.True(instance.IsNothing);
-            Assert.False(instance.IsJust);
-            Assert.Throws<InvalidOperationException>(() => 
-            {
-                var value = instance.Value;
-            });
-        }
-
-        private static void AssertJust<T>(Maybe<T> instance, T value)
-        {
-            Assert.False(instance.IsNothing);
-            Assert.True(instance.IsJust);
-            Assert.AreEqual(value, instance.Value);
         }
 
         private class TestRef 
