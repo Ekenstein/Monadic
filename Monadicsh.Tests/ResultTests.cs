@@ -73,19 +73,6 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestFailedOneErrorNull()
-        {
-            var error1 = new Error 
-            {
-                Code = "test1",
-                Description = "testdesc1"
-            };
-
-            var instance = Result.Failed(error1, default(Error));
-            instance.AssertFailed(new [] { error1 });
-        }
-
-        [Test]
         public void TestFailedErrorsNull()
         {
             var instance = Result.Failed(null);
@@ -103,13 +90,6 @@ namespace Monadicsh.Tests
 
             Result instance = error;
             instance.AssertFailed(new [] { error });
-        }
-
-        [Test]
-        public void TestFailedImplicitNull()
-        {
-            Result instance = default(Error);
-            instance.AssertFailed(new Error[0]);
         }
     }
 }

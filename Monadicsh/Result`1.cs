@@ -4,9 +4,10 @@ using Monadicsh.Extensions;
 
 namespace Monadicsh
 {
+    /// <inheritdoc />
     /// <summary>
-    /// A type representing either a <see cref="Result"/>
-    /// or a right value of type <see cref="T"/>.
+    /// A type representing either a <see cref="T:Monadicsh.Result" />
+    /// or a right value of type <see cref="!:T" />.
     /// </summary>
     /// <typeparam name="T">The type of the right value.</typeparam>
     public class Result<T> : Either<Result, T>

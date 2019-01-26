@@ -48,7 +48,7 @@ namespace Monadicsh
         public static Result Failed(params Error[] errors) => new Result 
         { 
             Succeeded = false, 
-            Errors = errors?.Where(e => e != null)?.ToArray() ?? new Error[0]
+            Errors = errors ?? new Error[0]
         };
 
         public static implicit operator Result(Error error) => Failed(error);

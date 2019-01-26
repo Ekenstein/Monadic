@@ -54,18 +54,6 @@ namespace Monadicsh.Tests
             instance.AssertFailed(Enumerable.Empty<Error>());
         }
 
-        [Test]
-        public void TestFailedOnErrorNull()
-        {
-            var error2 = new Error
-            {
-                Code = "test",
-                Description = "testdesc"
-            };
-            var instance = Result<int>.Failed(default(Error), error2);
-            instance.AssertFailed(new [] { error2 });
-        }
-
         [TestCase(1)]
         [TestCase(true)]
         [TestCase(false)]
