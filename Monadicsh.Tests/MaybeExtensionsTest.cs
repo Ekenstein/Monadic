@@ -296,6 +296,87 @@ namespace Monadicsh.Tests
             Assert.False(instance.Is(() => "notTest", equalityComparer));
         }
 
+        [Test]
+        public void TestToResultJust()
+        {
+            var instance = Maybe.Create(1);
+            var result = instance.ToResult(() => new[]
+            {
+                new Error
+                {
+                    Code = "UnexpectedError",
+                    Description = "Unexpected error"
+                }
+            });
+
+            result.AssertSuccess(1);
+        }
+
+        [Test]
+        public void TestToResultNothing()
+        {
+            var errors = new[]
+            {
+                new Error {Code = "test", Description = "testing"},
+                new Error {Code = "test2", Description = "testing2"}
+            };
+
+            var instance = Maybe<int>.Nothing;
+            var result = instance.ToResult(() => errors);
+            result.AssertFailed(errors);
+        }
+
+        [Test]
+        public void TestToResultNothingNullErrors()
+        {
+            var instance = Maybe<int>.Nothing;
+            var result = instance.ToResult(() => null);
+            result.AssertFailed(new Error[0]);
+        }
+
+        [Test]
+        public void TestToResultNull()
+        {
+            var instance = Maybe<int>.Nothing;
+            Assert.Throws<ArgumentNullException>(() => instance.ToResult(default(Func<IEnumerable<Error>>)));
+
+            instance = Maybe.Just(1);
+            Assert.Throws<ArgumentNullException>(() => instance.ToResult(default(Func<IEnumerable<Error>>)));
+        }
+
+        [Test]
+        public void TestToResultParamsJust()
+        {
+            var instance = Maybe.Just(1);
+            var result = instance.ToResult(new Error("test", "testing"), new Error("test2", "testing2"));
+            result.AssertSuccess(1);
+        }
+
+        [Test]
+        public void TestToResultParamsNothing()
+        {
+            var error = new Error("test", "testing");
+            var instance = Maybe<int>.Nothing;
+            var result = instance.ToResult(error);
+            result.AssertFailed(new [] {error});
+        }
+
+        [Test]
+        public void TestToResultParamsJustNull()
+        {
+            var instance = Maybe.Just(1);
+            var result = instance.ToResult(default(Error[]));
+            result.AssertSuccess(1);
+        }
+
+        [Test]
+        public void TestToResultParamsNothingNull()
+        {
+            var instance = Maybe<int>.Nothing;
+            var result = instance.ToResult(default(Error[]));
+            result.AssertFailed(new Error[0]);
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);

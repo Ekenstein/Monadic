@@ -314,5 +314,44 @@ namespace Monadicsh.Extensions
         /// Either Nothing if the given <paramref name="maybe"/> is Nothing, or the inner <paramref name="maybe"/>.
         /// </returns>
         public static Maybe<T> Flatten<T>(this Maybe<Maybe<T>> maybe) => maybe.Coalesce(v => v);
+
+        /// <summary>
+        /// Returns a <see cref="Result{T}"/> which is successful if the <paramref name="maybe"/>
+        /// represents a value, otherwise the result will be unsuccessful and will contain the errors
+        /// produced by the given <paramref name="errorSelector"/>.
+        /// A successful result will contain the value of the given <paramref name="maybe"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to create a <see cref="Result{T}"/> representation of.</param>
+        /// <param name="errorSelector">The function producing errors if the maybe represents Nothing.</param>
+        /// <returns>
+        /// A <see cref="Result{T}"/> which is successful if the maybe represents a value, otherwise
+        /// the result will be unsuccessful and will contain the errors produced by the given <paramref name="errorSelector"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="errorSelector"/> is null.</exception>
+        public static Result<T> ToResult<T>(this Maybe<T> maybe, Func<IEnumerable<Error>> errorSelector)
+        {
+            if (errorSelector == null)
+            {
+                throw new ArgumentNullException(nameof(errorSelector));
+            }
+
+            return maybe.Map(() => Result<T>.Failed(errorSelector()?.ToArray()), Result.Create);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Result{T}"/> which is successful if the <paramref name="maybe"/>
+        /// represents a value, otherwise the result will be unsuccessful and will contain the given <paramref name="errors"/>.
+        /// A successful result will contain the value of the given <paramref name="maybe"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to create a <see cref="Result{T}"/> representation of.</param>
+        /// <param name="errors">The errors describing the unsuccessful result if the maybe represents Nothing.</param>
+        /// <returns>
+        /// A <see cref="Result{T}"/> which is successful if the maybe represents a value, otherwise
+        /// the result will be unsuccessful and will contain the given <paramref name="errors"/>.
+        /// </returns>
+        public static Result<T> ToResult<T>(this Maybe<T> maybe, params Error[] errors) => maybe
+            .ToResult(() => errors);
     }
 }

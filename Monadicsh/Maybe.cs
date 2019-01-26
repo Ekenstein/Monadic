@@ -35,29 +35,29 @@ namespace Monadicsh
         /// <typeparam name="T">The type that the Maybe will encapsulate.</typeparam>
         /// <param name="value">The value that the maybe will wrap.</param>
         /// <returns>Either Nothing, if the <paramref name="value"/> is null, or Just <paramref name="value"/>.</returns>
-        public static Maybe<T> Create<T>(T t)
+        public static Maybe<T> Create<T>(T value)
         {
-            return t == null ? Maybe<T>.Nothing : Just(t);
+            return value == null ? Maybe<T>.Nothing : Just(value);
         }
 
         /// <summary>
-        /// Creates an <see cref="Maybe{T}"/> of the given string <paramref name="s"/>.
+        /// Creates an <see cref="Maybe{T}"/> of the given string <paramref name="value"/>.
         /// If the string is null or white space, Nothing will be returned, otherwise
-        /// Just <paramref name="s"/>.
+        /// Just <paramref name="value"/>.
         /// </summary>
-        /// <param name="s">The string to create a maybe.</param>
+        /// <param name="value">The string to create a maybe.</param>
         /// <returns>
-        /// Either Nothing if the string is null or white space, or Just <paramref name="s"/> if
+        /// Either Nothing if the string is null or white space, or Just <paramref name="value"/> if
         /// the string is non empty.
         /// </returns>
-        public static Maybe<string> CreateNonEmpty(string s) => string.IsNullOrWhiteSpace(s)
+        public static Maybe<string> CreateNonEmpty(string value) => string.IsNullOrWhiteSpace(value)
             ? Maybe<string>.Nothing
-            : Maybe.Just(s);
+            : Maybe.Just(value);
     }
 
     /// <summary>
-    /// The Maybe type encapsulates an optional value. A value of type <see cref="Maybe{T}"/> either contains a value of type <see cref="T"/> 
-    /// (represented as Just <see cref="T"/>), or it is empty (represented as Nothing).
+    /// The Maybe type encapsulates an optional value. A value of type <see cref="T:Monadicsh.Maybe`1" /> either contains a value of type <see cref="!:T" /> 
+    /// (represented as Just <see cref="!:T" />), or it is empty (represented as Nothing).
     /// </summary>
     /// <typeparam name="T">The type of value the Maybe is wrapping.</typeparam>
     public struct Maybe<T> : IEquatable<Maybe<T>>
