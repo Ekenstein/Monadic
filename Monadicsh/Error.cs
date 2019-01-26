@@ -2,6 +2,7 @@
 
 namespace Monadicsh
 {
+    /// <inheritdoc />
     /// <summary>
     /// A type representing a structured and descriptive error.
     /// </summary>
@@ -16,6 +17,19 @@ namespace Monadicsh
         /// A user friendly description of the error.
         /// </summary>
         public string Description { get; set; }
+
+        public Error() { }
+
+        /// <summary>
+        /// Creates an Error with the given <paramref name="code"/> and <paramref name="description"/>.
+        /// </summary>
+        /// <param name="code">The code for the error.</param>
+        /// <param name="description">The description of the error.</param>
+        public Error(string code, string description) : this()
+        {
+            Code = code;
+            Description = description;
+        }
 
         public override string ToString() => Code;
 
