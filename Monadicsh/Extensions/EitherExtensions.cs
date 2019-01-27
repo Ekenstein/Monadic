@@ -8,7 +8,7 @@ namespace Monadicsh.Extensions
     {
         /// <summary>
         /// Returns the left value of the given <paramref name="either"/>. If the <paramref name="either"/>
-        /// represents a right value, the exceptionSelector produced by the given <paramref name="exceptionSelector"/>
+        /// represents a right value, the exception produced by the given <paramref name="exceptionSelector"/>
         /// will be thrown.
         /// </summary>
         /// <typeparam name="T1">The type of the left value.</typeparam>
