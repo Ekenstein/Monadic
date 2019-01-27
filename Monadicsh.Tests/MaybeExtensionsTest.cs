@@ -377,6 +377,24 @@ namespace Monadicsh.Tests
             result.AssertFailed(new Error[0]);
         }
 
+        [Test]
+        public void TestOrNull()
+        {
+            var value = new TestRef(1);
+            var instance = Maybe.Just(value);
+            var result = instance.OrNull();
+            Assert.IsNotNull(result);
+            Assert.AreEqual(value, result);
+        }
+
+        [Test]
+        public void TestOrNullNothing()
+        {
+            var instance = Maybe<TestRef>.Nothing;
+            var result = instance.OrNull();
+            Assert.IsNull(result);
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);

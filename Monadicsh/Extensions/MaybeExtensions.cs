@@ -34,6 +34,18 @@ namespace Monadicsh.Extensions
         public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
 
         /// <summary>
+        /// Returns the value of the given <paramref name="maybe"/> or null if the maybe
+        /// is representing Nothing.
+        /// </summary>
+        /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe that should have its value extracted from it.</param>
+        /// <returns>
+        /// The value of the given <paramref name="maybe"/> or null if the maybe is representing Nothing.
+        /// </returns>
+        public static T OrNull<T>(this Maybe<T> maybe) where T : class => maybe
+            .Or(() => default(T));
+
+        /// <summary>
         /// Returns either the value of the maybe mapped to the new type <typeparamref name="T2"/> or
         /// the produced default value iff the maybe represents Nothing.
         /// </summary>
