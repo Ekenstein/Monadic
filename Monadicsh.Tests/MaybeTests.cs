@@ -118,28 +118,6 @@ namespace Monadicsh.Tests
             instance.AssertNothing();
         }
 
-        [TestCase(default(int))]
-        [TestCase(default(bool))]
-        [TestCaseSource(nameof(TestRefCases))]
-        public void TestImplicitFromMaybe<T>(T value)
-        {
-            Maybe<T> instance = value;
-            instance.AssertJust(value);
-            AssertEqual(instance, value);
-        }
-
-        [Test]
-        public void TestImplicitFromMaybeNull()
-        {
-            Maybe<TestRef> instance = null;
-            instance.AssertNothing();
-            AssertEqual(instance, default(TestRef));
-
-            var instance2 = Maybe<int>.Nothing;
-            instance2.AssertNothing();
-            AssertEqual(instance2, default(int));
-        }
-
         [Test]
         public void TestEqualsJust()
         {
@@ -195,11 +173,6 @@ namespace Monadicsh.Tests
 
             instance = Maybe.CreateNonEmpty(" ");
             instance.AssertNothing();
-        }
-
-        private static void AssertEqual<T>(Maybe<T> t1, T t2)
-        {
-            Assert.AreEqual((T)t1, t2);
         }
 
         private class TestRef 
