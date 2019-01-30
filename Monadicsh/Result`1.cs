@@ -76,10 +76,11 @@ namespace Monadicsh
         /// <param name="result">The result to create a <see cref="Maybe{T}"/> of.</param>
         public static implicit operator Maybe<T>(Result<T> result) => result.Item;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Returns a string representation of the current instance of <see cref="Result{T}"/>.
+        /// Returns a string representation of the current instance of <see cref="T:Monadicsh.Result`1" />.
         /// </summary>
-        /// <returns>The string representation of the current instance of <see cref="Result{T}"/>.</returns>
+        /// <returns>The string representation of the current instance of <see cref="T:Monadicsh.Result`1" />.</returns>
         public override string ToString() => this.FromEither(
             fromL: l => l.ToString(),
             fromR: r => $"Success: ({r})");

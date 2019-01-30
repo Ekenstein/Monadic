@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Monadicsh.Extensions
 {
+    /// <summary>
+    /// Provides a set of static extensions for the types <see cref="Result"/> and <see cref="Result{T}"/>.
+    /// </summary>
     public static class ResultExtensions
     {
         /// <summary>

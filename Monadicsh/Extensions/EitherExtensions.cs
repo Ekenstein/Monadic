@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Monadicsh.Extensions
 {
+    /// <summary>
+    /// Provides a set of static extensions for the type <see cref="Either{T1,T2}"/>.
+    /// </summary>
     public static class EitherExtensions
     {
         /// <summary>
