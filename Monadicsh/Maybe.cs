@@ -5,6 +5,9 @@ using Monadicsh.Extensions;
 
 namespace Monadicsh
 {
+    /// <summary>
+    /// Provides a static set of methods for creating <see cref="Maybe{T}"/>.
+    /// </summary>
     public static class Maybe
     {
         /// <summary>
@@ -52,7 +55,7 @@ namespace Monadicsh
         /// </returns>
         public static Maybe<string> CreateNonEmpty(string value) => string.IsNullOrWhiteSpace(value)
             ? Maybe<string>.Nothing
-            : Maybe.Just(value);
+            : Just(value);
     }
 
     /// <summary>
@@ -110,10 +113,28 @@ namespace Monadicsh
         /// </summary>
         public bool IsJust => !IsNothing;
 
-        public static implicit operator Maybe<T>(T t) => Maybe.Create(t);
+        /// <summary>
+        /// Creates a <see cref="Maybe{T}"/> of the given <paramref name="value"/>.
+        /// If the value is null, <see cref="Maybe{T}.Nothing"/> will be returned,
+        /// otherwise <see cref="Maybe{T}.Just"/> value.
+        /// </summary>
+        /// <param name="value">The value to create a maybe of.</param>
+        public static implicit operator Maybe<T>(T value) => Maybe.Create(value);
 
-        public override string ToString() => this.Map("Nothing", v => $"Just ({v})");
+        /// <summary>
+        /// Returns a string representation of the Maybe.
+        /// </summary>
+        /// <returns>The string representation of the maybe.</returns>
+        public override string ToString() => this.Map("Nothing", v => $"Just ({v})"); 
 
+        /// <inheritdoc />
+        /// <summary>
+        /// Returns a flag indicating whether the <paramref name="other"/> maybe equals the instance.
+        /// Two maybe's are equal to each other if either both maybes' are Nothing,
+        /// or if the value they are holding are equal to each other.
+        /// </summary>
+        /// <param name="other">The other maybe to compare with the instance.</param>
+        /// <returns>True if the <paramref name="other"/> maybe equals the instance.</returns>
         public bool Equals(Maybe<T> other)
         {
             if (IsNothing && other.IsNothing) return true;
@@ -125,12 +146,25 @@ namespace Monadicsh
             return false;
         }
 
+        /// <summary>
+        /// Checks equality between the given <paramref name="obj"/> and the instance.
+        /// Returns false if the given <paramref name="obj"/> is either null or if
+        /// the object isn't of type <see cref="Maybe{T}"/>. Otherwise,
+        /// the same equality check as <see cref="Equals(Monadicsh.Maybe{T})"/>
+        /// will be performed.
+        /// </summary>
+        /// <param name="obj">The object to check if it is equal to the instance.</param>
+        /// <returns>True if the given <paramref name="obj"/> is equal to the instance, otherwise false.</returns>
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             return obj is Maybe<T> other && Equals(other);
         }
 
+        /// <summary>
+        /// Returns a hash code for this instance of <see cref="Maybe{T}"/>.
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             unchecked

@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace Monadicsh.Extensions
 {
+    /// <summary>
+    /// Provides a static set of extension methods for the <see cref="Maybe{T}"/> type.
+    /// </summary>
     public static class MaybeExtensions
     {
         /// <summary>
@@ -365,5 +368,131 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static Result<T> ToResult<T>(this Maybe<T> maybe, params Error[] errors) => maybe
             .ToResult(() => errors);
+
+        /// <summary>
+        /// Checks whether the value of the given <paramref name="maybe"/> is valid or not by using
+        /// the given <paramref name="predicate"/>.
+        /// If the value is valid, the <paramref name="maybe"/> will be returned, otherwise Nothing.
+        /// </summary>
+        /// <typeparam name="T">The type of the value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to check whether its value is valid or not.</param>
+        /// <param name="predicate">Function that takes the value of the maybe and returns a flag indicating if the value is valid or not.</param>
+        /// <returns>
+        /// Nothing if the <paramref name="maybe"/> is either Nothing or that the value isn't valid, otherwise
+        /// the given <paramref name="maybe"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="predicate"/> is null.</exception>
+        public static Maybe<T> Guard<T>(this Maybe<T> maybe, Func<T, bool> predicate)
+        {
+            if (predicate == null)
+            {
+                throw new ArgumentNullException(nameof(predicate));
+            }
+
+            return maybe.Coalesce(v => predicate(v) ? maybe : Maybe<T>.Nothing);
+        }
+
+        /// <summary>
+        /// Checks whether the value of the given <paramref name="maybe"/> is equal to the
+        /// <paramref name="expectedValue"/>. If it is, the <paramref name="maybe"/>
+        /// will be returned, otherwise Nothing. The default equality comparer for <typeparamref name="T"/>
+        /// will be used.
+        /// </summary>
+        /// <typeparam name="T">The type of the value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to check whether its valid is equal to the expected value or not.</param>
+        /// <param name="expectedValue">The value that is expected to be equal to the value of the maybe.</param>
+        /// <returns>
+        /// Nothing if the <paramref name="maybe"/> is either Nothing or that the value isn't equal
+        /// to the <paramref name="expectedValue"/>. Otherwise the given <paramref name="maybe"/> will
+        /// be returned.
+        /// </returns>
+        public static Maybe<T> Guard<T>(this Maybe<T> maybe, T expectedValue)
+        {
+            return maybe.Guard(expectedValue, EqualityComparer<T>.Default);
+        }
+
+        /// <summary>
+        /// Checks whether the value of the given <paramref name="maybe"/> is equal to the
+        /// <paramref name="expectedValue"/>. If it is, the <paramref name="maybe"/>
+        /// will be returned, otherwise Nothing. The given <paramref name="equalityComparer"/>
+        /// will be used to check for equality.
+        /// </summary>
+        /// <typeparam name="T">The type of the value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to check whether its valid is equal to the expected value or not.</param>
+        /// <param name="expectedValue">The value that is expected to be equal to the value of the maybe.</param>
+        /// <param name="equalityComparer">The equality comparer to use to compare the expected value and the value of the maybe with.</param>
+        /// <returns>
+        /// Nothing if the <paramref name="maybe"/> is either Nothing or that the value isn't equal
+        /// to the <paramref name="expectedValue"/>. Otherwise the given <paramref name="maybe"/> will
+        /// be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="equalityComparer"/> is null.</exception>
+        public static Maybe<T> Guard<T>(this Maybe<T> maybe, T expectedValue, IEqualityComparer<T> equalityComparer)
+        {
+            if (equalityComparer == null)
+            {
+                throw new ArgumentNullException(nameof(equalityComparer));
+            }
+
+            return maybe.Guard(() => expectedValue, equalityComparer);
+        }
+
+        /// <summary>
+        /// Checks whether the value of the given <paramref name="maybe"/> is equal to the
+        /// value produced by the given <paramref name="expectedValueSelector"/>. If it is, the <paramref name="maybe"/>
+        /// will be returned, otherwise Nothing. The default equality comparer for <typeparamref name="T"/>
+        /// will be used.
+        /// </summary>
+        /// <typeparam name="T">The type of the value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to check whether its valid is equal to the expected value or not.</param>
+        /// <param name="expectedValueSelector">The function producing the value that is expected to be equal to the value of the maybe.</param>
+        /// <returns>
+        /// Nothing if the <paramref name="maybe"/> is either Nothing or that the value isn't equal
+        /// to the value produced by the given <paramref name="expectedValueSelector"/>.
+        /// Otherwise the given <paramref name="maybe"/> will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="expectedValueSelector"/> is null.</exception>
+        public static Maybe<T> Guard<T>(this Maybe<T> maybe, Func<T> expectedValueSelector)
+        {
+            if (expectedValueSelector == null)
+            {
+                throw new ArgumentNullException(nameof(expectedValueSelector));
+            }
+
+            return maybe.Guard(expectedValueSelector, EqualityComparer<T>.Default);
+        }
+
+        /// <summary>
+        /// Checks whether the value of the given <paramref name="maybe"/> is equal to the
+        /// value produced by the given <paramref name="expectedValueSelector"/>. If it is, the <paramref name="maybe"/>
+        /// will be returned, otherwise Nothing. The given <paramref name="equalityComparer"/> will
+        /// be used to check for equality between the values.
+        /// </summary>
+        /// <typeparam name="T">The type of the value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to check whether its valid is equal to the expected value or not.</param>
+        /// <param name="expectedValueSelector">The function producing the value that is expected to be equal to the value of the maybe.</param>
+        /// <param name="equalityComparer">The equality comparer to use to compare the expected value and the value of the maybe with.</param>
+        /// <returns>
+        /// Nothing if the <paramref name="maybe"/> is either Nothing or that the value isn't equal
+        /// to the value produced by the given <paramref name="expectedValueSelector"/>.
+        /// Otherwise the given <paramref name="maybe"/> will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If the given <paramref name="expectedValueSelector"/> or <paramref name="equalityComparer"/> are null.
+        /// </exception>
+        public static Maybe<T> Guard<T>(this Maybe<T> maybe, Func<T> expectedValueSelector, IEqualityComparer<T> equalityComparer)
+        {
+            if (expectedValueSelector == null)
+            {
+                throw new ArgumentNullException(nameof(expectedValueSelector));
+            }
+
+            if (equalityComparer == null)
+            {
+                throw new ArgumentNullException(nameof(equalityComparer));
+            }
+
+            return maybe.Guard(v => equalityComparer.Equals(v, expectedValueSelector()));
+        }
     }
 }

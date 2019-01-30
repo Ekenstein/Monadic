@@ -7,9 +7,9 @@ namespace Monadicsh
     /// <inheritdoc />
     /// <summary>
     /// A type representing either a <see cref="T:Monadicsh.Result" />
-    /// or a right value of type <see cref="!:T" />.
+    /// or a right value of type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T">The type of the right value.</typeparam>
+    /// <typeparam name="T">The type of the successful value.</typeparam>
     public class Result<T> : Either<Result, T>
     {
         /// <summary>
@@ -52,14 +52,34 @@ namespace Monadicsh
         /// <exception cref="ArgumentNullException">If the given <paramref name="item"/> is null.</exception>
         public static Result<T> Success(T item) => new Result<T>(item);
 
+        /// <summary>
+        /// Creates an unsuccessful <see cref="Result{T}"/> which will contain
+        /// the given <paramref name="error"/>.
+        /// </summary>
+        /// <param name="error">The error describing why the result was unsuccessful.</param>
         public static implicit operator Result<T>(Error error) => Failed(error);
 
-        public static implicit operator Result<T>(T t) => Success(t);
-
+        /// <summary>
+        /// Returns a <see cref="Result"/> of the given <paramref name="result"/>.
+        /// If the given <paramref name="result"/> is indicating of unsuccessful result,
+        /// an unsuccessful <see cref="Result"/> will be returned containing the errors of the given <paramref name="result"/>.
+        /// Otherwise <see cref="Result.Success"/> will be returned.
+        /// </summary>
+        /// <param name="result">The result to create a <see cref="Result"/> of.</param>
         public static implicit operator Result(Result<T> result) => result.FromLeft(Result.Success);
 
+        /// <summary>
+        /// Returns a <see cref="Maybe{T}"/> representation of the given <paramref name="result"/>.
+        /// If the given <paramref name="result"/> is indicating of a unsuccessful result, <see cref="Maybe{T}.Nothing"/>
+        /// will be returned, otherwise <see cref="Maybe{T}.Just"/> of the item the result is holding.
+        /// </summary>
+        /// <param name="result">The result to create a <see cref="Maybe{T}"/> of.</param>
         public static implicit operator Maybe<T>(Result<T> result) => result.Item;
 
+        /// <summary>
+        /// Returns a string representation of the current instance of <see cref="Result{T}"/>.
+        /// </summary>
+        /// <returns>The string representation of the current instance of <see cref="Result{T}"/>.</returns>
         public override string ToString() => this.FromEither(
             fromL: l => l.ToString(),
             fromR: r => $"Success: ({r})");

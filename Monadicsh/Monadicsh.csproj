@@ -4,6 +4,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Monadicsh</AssemblyName>
     <RootNamespace>Monadicsh</RootNamespace>
+    <Authors>Gabriel Ekblad</Authors>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>C:\git\Monadic\Monadicsh\Monadicsh.xml</DocumentationFile>
+    <OutputPath>bin\Debug\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\git\Monadic\Monadicsh\Monadicsh.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>

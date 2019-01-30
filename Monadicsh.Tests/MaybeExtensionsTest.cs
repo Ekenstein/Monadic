@@ -395,6 +395,78 @@ namespace Monadicsh.Tests
             Assert.IsNull(result);
         }
 
+        [Test]
+        public void TestGuardPredicate()
+        {
+            var instance = Maybe.Just(5);
+            var result = instance.Guard(v => v - 1 == 4);
+            result.AssertJust(5);
+
+            result = instance.Guard(v => v == 4);
+            result.AssertNothing();
+
+            instance = Maybe<int>.Nothing;
+            result = instance.Guard(v => v == 5);
+            result.AssertNothing();
+
+            Assert.Throws<ArgumentNullException>(() => instance.Guard(default(Func<int, bool>)));
+        }
+
+        [Test]
+        public void TestGuardValueWithoutEqualityComparer()
+        {
+            var instance = Maybe.Just("test");
+            var result = instance.Guard("test");
+            result.AssertJust("test");
+
+            result = instance.Guard("notTest");
+            result.AssertNothing();
+
+            result = instance.Guard(default(string));
+            result.AssertNothing();
+
+            result = instance.Guard(() => "test");
+            result.AssertJust("test");
+
+            result = instance.Guard(() => "notTest");
+            result.AssertNothing();
+
+            result = instance.Guard(() => default(string));
+            result.AssertNothing();
+
+            Assert.Throws<ArgumentNullException>(() => instance.Guard(default(Func<string>)));
+        }
+
+        [Test]
+        public void TestGuardValueWithEqualityComparer()
+        {
+            var equalityComparer = new TestEqualityComparer();
+            var instance = Maybe.Just("test");
+            
+            var result = instance.Guard("test", equalityComparer);
+            result.AssertJust("test");
+
+            result = instance.Guard("notTest", equalityComparer);
+            result.AssertNothing();
+
+            result = instance.Guard(default(string), equalityComparer);
+            result.AssertNothing();
+
+            result = instance.Guard(() => "test", equalityComparer);
+            result.AssertJust("test");
+
+            result = instance.Guard(() => "notTest", equalityComparer);
+            result.AssertNothing();
+
+            result = instance.Guard(() => default(string), equalityComparer);
+            result.AssertNothing();
+
+            Assert.Throws<ArgumentNullException>(() => instance.Guard("test", null));
+            Assert.Throws<ArgumentNullException>(() => instance.Guard(() => "test", null));
+            Assert.Throws<ArgumentNullException>(() => instance.Guard(default(Func<string>), equalityComparer));
+            Assert.Throws<ArgumentNullException>(() => instance.Guard(default(Func<string>), null));
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Monadicsh
 {
@@ -51,8 +50,17 @@ namespace Monadicsh
             Errors = errors ?? new Error[0]
         };
 
+        /// <summary>
+        /// Creates an unsuccessful <see cref="Result"/> which will have the given
+        /// <paramref name="error"/> as reason to why it was unsuccessful.
+        /// </summary>
+        /// <param name="error">The error describing why the result was unsuccessful.</param>
         public static implicit operator Result(Error error) => Failed(error);
 
+        /// <summary>
+        /// Returns a string representation of the current instance of <see cref="Result"/>.
+        /// </summary>
+        /// <returns>The string representation of the current instance of <see cref="Result"/>.</returns>
         public override string ToString() => Succeeded
             ? "Success"
             : $"Failed: {string.Join(",", Errors)}";
