@@ -29,53 +29,100 @@ namespace Monadicsh.Extensions
         /// containing unique errors of both the results, otherwise
         /// a successful result will be returned.
         /// </summary>
-        /// <param name="self">The inner result.</param>
-        /// <param name="result">The outer result to and with the inner.</param>
+        /// <param name="inner">The inner result.</param>
+        /// <param name="outer">The outer result to and with the inner.</param>
         /// <returns>
         /// Either a successful result if both results were successful, or an unsuccessful result
         /// if either the inner or outer result was unsuccessful.
         /// </returns>
-        public static Result And(this Result self, Result result)
+        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outer"/> is null.</exception>
+        public static Result And(this Result inner, Result outer)
         {
-            if (self.Succeeded && result.Succeeded)
+            if (inner == null)
+            {
+                throw new ArgumentNullException(nameof(inner));
+            }
+
+            if (outer == null)
+            {
+                throw new ArgumentNullException(nameof(outer));
+            }
+
+            if (inner.Succeeded && outer.Succeeded)
             {
                 return Result.Success;
             }
 
-            var errors = self
+            var errors = inner
                 .Errors
-                .Union(result.Errors)
+                .Union(outer.Errors)
                 .ToArray();
 
             return Result.Failed(errors);
         }
 
         /// <summary>
-        /// Ors together the inner <see cref="Result"/> with the
-        /// outer <see cref="Result"/>. If one of the results are
-        /// successful, a successful result will be returned, otherwise
-        /// an unsuccessful result will be returned containing unique errors of both
-        /// results.
+        /// Returns a result indicating whether the given <paramref name="inner"/> or the
+        /// <paramref name="outer"/> result was successful.
+        /// If none of the results are successful, <see cref="Result.Failed"/> will be returned
+        /// containing errors from both of the results.
         /// </summary>
-        /// <param name="self">The inner result.</param>
+        /// <param name="inner">The inner result.</param>
         /// <param name="outer">The outer result to or with the inner result.</param>
         /// <returns>
-        /// A successful result if either the inner or outer result is successful, otherwise
+        /// A successful result if either the inner or outer result was successful, otherwise
         /// an unsuccessful result containing errors from both results.
         /// </returns>
-        public static Result Or(this Result self, Result outer)
+        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outer"/> is null.</exception>
+        public static Result Or(this Result inner, Result outer)
         {
-            if (self.Succeeded || outer.Succeeded)
+            if (inner == null)
+            {
+                throw new ArgumentNullException(nameof(inner));
+            }
+
+            if (outer == null)
+            {
+                throw new ArgumentNullException(nameof(outer));
+            }
+
+            return inner.Or(() => outer);
+        }
+
+        /// <summary>
+        /// Returns a result indicating whether the given <paramref name="inner"/> or the result
+        /// produced by the given <paramref name="outerSelector"/> was successful.
+        /// If none of the results are successful, <see cref="Result.Failed"/> will be returned
+        /// containing errors from both of the results.
+        /// </summary>
+        /// <param name="inner">The inner result that may or may not be successful.</param>
+        /// <param name="outerSelector">The function producing the outer result that may or may not be successful.</param>
+        /// <returns>
+        /// A <see cref="Result"/> where a successful result means that one or both results were successful.
+        /// If both results were failed, a failed result will be returned containing both of the results' errors.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outerSelector"/> is null.</exception>
+        public static Result Or(this Result inner, Func<Result> outerSelector)
+        {
+            if (inner == null)
+            {
+                throw new ArgumentNullException(nameof(inner));
+            }
+
+            if (outerSelector == null)
+            {
+                throw new ArgumentNullException(nameof(outerSelector));
+            }
+
+            if (inner.Succeeded)
             {
                 return Result.Success;
             }
 
-            var errors = self
-                .Errors
-                .Union(outer.Errors)
-                .ToArray();
-
-            return Result.Failed(errors);
+            var outerResult = outerSelector();
+            return outerResult.Succeeded 
+                ? Result.Success 
+                : Result.Failed(outerResult.Errors.Union(inner.Errors).ToArray());
         }
 
         /// <summary>

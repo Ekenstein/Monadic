@@ -80,6 +80,47 @@ namespace Monadicsh.Tests
             result.AssertSuccess();
         }
 
+        [Test]
+        public void TestOrFuncSuccess()
+        {
+            var inner = Result.Success;
+            var outer = Result.Failed();
+
+            var outer1 = outer;
+            var result = inner.Or(() =>
+            {
+                Assert.Fail("Outer was invoked even though the inner was successful.");
+                return outer1;
+            });
+
+            result.AssertSuccess();
+
+            inner = Result.Failed();
+            outer = Result.Success;
+
+            result = inner.Or(() => outer);
+            result.AssertSuccess();
+        }
+
+        [TestCaseSource(nameof(ResultsThatAreAllFailed))]
+        public void TestOrFuncFailed((Result result1, Result result2) testCase)
+        {
+            var result = testCase.result1.Or(() => testCase.result2);
+            AssertFailed(testCase, result);
+
+            result = testCase.result2.Or(() => testCase.result1);
+            AssertFailed(testCase, result);
+        }
+
+        [Test]
+        public void TestOrFuncArgumentNull()
+        {
+            Assert.Throws<ArgumentNullException>(() => default(Result).Or(() => Result.Success));
+            Assert.Throws<ArgumentNullException>(() => default(Result).Or(default(Func<Result>)));
+            Assert.Throws<ArgumentNullException>(() => Result.Failed().Or(default(Func<Result>)));
+            Assert.Throws<ArgumentNullException>(() => Result.Success.Or(default(Func<Result>)));
+        }
+
         [TestCaseSource(nameof(ResultsThatAreMixed))]
         public void TestAndFailed((Result, Result) testCase)
         {
