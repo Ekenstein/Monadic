@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using System;
+using System.Linq;
 
 namespace Monadicsh.Tests
 {
@@ -173,6 +174,16 @@ namespace Monadicsh.Tests
 
             instance = Maybe.CreateNonEmpty(" ");
             instance.AssertNothing();
+        }
+
+        [Test]
+        public void TestEnumerable()
+        {
+            var instance = Maybe.Just(1);
+            Assert.AreEqual(1, instance.Count());
+
+            instance = Maybe<int>.Nothing;
+            Assert.IsEmpty(instance);
         }
 
         private class TestRef 

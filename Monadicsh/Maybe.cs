@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Monadicsh.Extensions;
@@ -63,7 +64,7 @@ namespace Monadicsh
     /// (represented as Just <see cref="!:T" />), or it is empty (represented as Nothing).
     /// </summary>
     /// <typeparam name="T">The type of value the Maybe is wrapping.</typeparam>
-    public struct Maybe<T> : IEquatable<Maybe<T>>
+    public struct Maybe<T> : IEquatable<Maybe<T>>, IEnumerable<T>
     {
         private readonly IEnumerable<T> _item;
 
@@ -81,7 +82,7 @@ namespace Monadicsh
                 throw new ArgumentNullException(nameof(value));
             }
 
-            return new Maybe<T>(new [] { value });
+            return new Maybe<T>(new[] { value });
         }
 
         /// <summary>
@@ -125,7 +126,7 @@ namespace Monadicsh
         /// Returns a string representation of the Maybe.
         /// </summary>
         /// <returns>The string representation of the maybe.</returns>
-        public override string ToString() => this.Map("Nothing", v => $"Just ({v})"); 
+        public override string ToString() => this.Map("Nothing", v => $"Just ({v})");
 
         /// <inheritdoc />
         /// <summary>
@@ -172,5 +173,17 @@ namespace Monadicsh
                 return IsNothing ? 0 : Value.GetHashCode() * 397;
             }
         }
+
+        /// <summary>
+        /// Returns an enumerator representing the Maybe. If the maybe represents
+        /// Just a value, the enumerator will contain exactly one element. If the maybe
+        /// represents Nothing, the enumerator will contain no elements.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerator{T}"/> that contains either zero or one element.
+        /// </returns>
+        public IEnumerator<T> GetEnumerator() => _item.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
