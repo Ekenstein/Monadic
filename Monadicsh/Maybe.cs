@@ -64,7 +64,10 @@ namespace Monadicsh
         /// throws an exception.
         /// </summary>
         /// <typeparam name="T">The type that the maybe will encapsulate.</typeparam>
-        /// <param name="valueSelector">The function that provides the value that should be encapsulated with a <see cref="Maybe{T}"/>.</param>
+        /// <param name="valueSelector">
+        /// The function that provides the value that should be encapsulated with a <see cref="Maybe{T}"/> and may
+        /// or may not throw an exception.
+        /// </param>
         /// <returns>
         /// <see cref="Maybe{T}.Just(T)"/> if the value produced by the <paramref name="valueSelector"/> is a non-null value,
         /// otherwise <see cref="Maybe{T}.Nothing"/> if either the value is null or that the <paramref name="valueSelector"/>
@@ -78,14 +81,17 @@ namespace Monadicsh
                 throw new ArgumentNullException(nameof(valueSelector));
             }
 
+            T value;
             try
             {
-                return Create(valueSelector());
+                value = valueSelector();
             }
             catch
             {
                 return Maybe<T>.Nothing;
             }
+            
+            return Create(value);
         }
     }
 
