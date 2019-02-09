@@ -57,6 +57,36 @@ namespace Monadicsh
         public static Maybe<string> CreateNonEmpty(string value) => string.IsNullOrWhiteSpace(value)
             ? Maybe<string>.Nothing
             : Just(value);
+
+        /// <summary>
+        /// Returns <see cref="Maybe{T}.Just(T)"/> if the value produced by the given <paramref name="valueSelector"/>
+        /// is not null, otherwise <see cref="Maybe{T}.Nothing"/> if either the value is null or if the <paramref name="valueSelector"/>
+        /// throws an exception.
+        /// </summary>
+        /// <typeparam name="T">The type that the maybe will encapsulate.</typeparam>
+        /// <param name="valueSelector">The function that provides the value that should be encapsulated with a <see cref="Maybe{T}"/>.</param>
+        /// <returns>
+        /// <see cref="Maybe{T}.Just(T)"/> if the value produced by the <paramref name="valueSelector"/> is a non-null value,
+        /// otherwise <see cref="Maybe{T}.Nothing"/> if either the value is null or that the <paramref name="valueSelector"/>
+        /// throws an exception.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="valueSelector"/> is null.</exception>
+        public static Maybe<T> Try<T>(Func<T> valueSelector)
+        {
+            if (valueSelector == null)
+            {
+                throw new ArgumentNullException(nameof(valueSelector));
+            }
+
+            try
+            {
+                return Create(valueSelector());
+            }
+            catch
+            {
+                return Maybe<T>.Nothing;
+            }
+        }
     }
 
     /// <summary>

@@ -186,6 +186,19 @@ namespace Monadicsh.Tests
             Assert.IsEmpty(instance);
         }
 
+        [Test]
+        public void TestTry()
+        {
+            var instance = Maybe.Try(() => "test");
+            instance.AssertJust("test");
+
+            instance = Maybe.Try(() => default(string));
+            instance.AssertNothing();
+
+            instance = Maybe.Try(() => Enumerable.Empty<string>().Single());
+            instance.AssertNothing();
+        }
+
         private class TestRef 
         {     
         }

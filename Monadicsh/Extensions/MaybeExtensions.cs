@@ -97,6 +97,23 @@ namespace Monadicsh.Extensions
             .Map(() => defaultValue, map);
 
         /// <summary>
+        /// Casts the value of the given <paramref name="maybe"/> from
+        /// <typeparamref name="T1"/> to <typeparamref name="T2"/>.
+        /// If the value of the maybe couldn't be casted to the new type, Nothing will be returned.
+        /// </summary>
+        /// <typeparam name="T1">The type of the value that the maybe is currently holding.</typeparam>
+        /// <typeparam name="T2">The type of value that the new maybe will be holding.</typeparam>
+        /// <param name="maybe">The maybe which the value of should be casted to a new type.</param>
+        /// <returns>
+        /// A maybe of type <typeparamref name="T2"/> which either represents Nothing if either
+        /// the value of the given maybe was Nothing or if the value of the maybe couldn't be casted to the new type.
+        /// </returns>
+        public static Maybe<T2> Cast<T1, T2>(this Maybe<T1> maybe)
+        {
+            return Maybe.Try(() => maybe.Cast<T2>().SingleOrDefault());
+        }
+
+        /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> or throws
         /// the exception produced by the given <paramref name="exceptionSelector"/> 
         /// iff the maybe represents Nothing.

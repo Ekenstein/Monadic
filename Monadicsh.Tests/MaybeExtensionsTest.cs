@@ -467,6 +467,26 @@ namespace Monadicsh.Tests
             Assert.Throws<ArgumentNullException>(() => instance.Guard(default(Func<string>), null));
         }
 
+        [Test]
+        public void TestCast()
+        {
+            var instance = Maybe.Just(1);
+            var result = instance.Cast<int, int?>();
+            result.AssertJust(1);
+
+            instance = Maybe<int>.Nothing;
+            result = instance.Cast<int, int?>();
+            result.AssertNothing();
+
+            var instance2 = Maybe.Just((int?)1);
+            var result2 = instance2.Cast<int?, int>();
+            result2.AssertJust(1);
+
+            var instance3 = Maybe.Just("test");
+            var result3 = instance3.Cast<string, int>();
+            result3.AssertNothing();
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);
