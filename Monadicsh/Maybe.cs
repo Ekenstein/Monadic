@@ -218,7 +218,7 @@ namespace Monadicsh
         /// <returns>
         /// An <see cref="IEnumerator{T}"/> that contains either zero or one element.
         /// </returns>
-        public IEnumerator<T> GetEnumerator() => _item.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => _item?.GetEnumerator() ?? Enumerable.Empty<T>().GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }

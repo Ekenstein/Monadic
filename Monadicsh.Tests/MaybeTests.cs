@@ -184,6 +184,9 @@ namespace Monadicsh.Tests
 
             instance = Maybe<int>.Nothing;
             Assert.IsEmpty(instance);
+
+            instance = default(Maybe<int>);
+            Assert.IsEmpty(instance);
         }
 
         [Test]
