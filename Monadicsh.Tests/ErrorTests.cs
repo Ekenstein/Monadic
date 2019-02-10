@@ -60,5 +60,26 @@ namespace Monadicsh.Tests
             areEqual = error2.Equals(error1);
             Assert.AreEqual(equivalent, areEqual);
         }
+        
+        [Test]
+        public void TestFailedWhereErrorContainsNull()
+        {
+            {
+                var error = new Error("test", "testdesc");
+                var errors = new[]
+                {
+                    error,
+                    default(Error)
+                };
+
+                var result = Result.Failed(errors);
+                result.AssertFailed(new[] { error });
+            }
+            {
+                var errors = new [] {default(Error)};
+                var result = Result.Failed(errors);
+                result.AssertFailed(new Error[0]);
+            }
+        }
     }
 }
