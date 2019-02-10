@@ -127,6 +127,20 @@ namespace Monadicsh.Tests
         }
 
         [Test]
+        public void TestToEitherLeftNull()
+        {
+            var instance = Maybe<string>.Nothing;
+            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(string)));
+        }
+    
+        [Test]
+        public void TestToEitherRightNull()
+        {
+            var instance = Maybe.Just("test");
+            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(string)));
+        }
+
+        [Test]
         public void TestToEitherFuncRight()
         {
             var instance = Maybe.Just(1);
@@ -143,6 +157,22 @@ namespace Monadicsh.Tests
         }
 
         [Test]
+        public void TestToEitherFuncLeftNull()
+        {
+            var instance = Maybe<string>.Nothing;
+            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(Func<string>)));
+            Assert.Throws<ArgumentNullException>(() => instance.ToEither(() => default(string)));
+        }
+
+        public void TestToEitherFuncRightNull()
+        {
+            var instance = Maybe.Just("test");
+            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(Func<string>)));
+            var result = instance.ToEither(() => default(string));
+            result.AssertRight("test");
+        }
+
+        [Test]
         public void TestOrThrow()
         {
             var instance = Maybe.Just(1);
@@ -155,6 +185,16 @@ namespace Monadicsh.Tests
         {
             var instance = Maybe<int>.Nothing;
             Assert.Throws<Exception>(() => instance.OrThrow(() => new Exception()));
+        }
+
+        [Test]
+        public void TestOrThrowFuncNull()
+        {
+            var instance = Maybe<int>.Nothing;
+            Assert.Throws<ArgumentNullException>(() => instance.OrThrow(default(Func<Exception>)));
+
+            instance = Maybe.Just(1);
+            Assert.Throws<ArgumentNullException>(() => instance.OrThrow(default(Func<Exception>)));
         }
 
         [Test]

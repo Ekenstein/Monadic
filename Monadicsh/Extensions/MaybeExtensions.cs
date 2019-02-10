@@ -215,8 +215,16 @@ namespace Monadicsh.Extensions
         /// If the maybe is representing Nothing, the left side will be populated by the given <paramref name="defaultValue"/>,
         /// otherwise the right side will be populated by the value of the maybe.
         /// </returns>
-        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, T1 defaultValue) =>
-            maybe.ToEither(() => defaultValue);
+        /// <exception cref="ArgumentNullException">If the given <paramref name="defaultValue"/> is null.</exception>
+        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, T1 defaultValue)
+        {
+            if (defaultValue == null)
+            {
+                throw new ArgumentNullException(nameof(defaultValue));
+            }
+
+            return maybe.ToEither(() => defaultValue);
+        }
 
         /// <summary>
         /// Tests the given <paramref name="maybe"/> for Nothing before performing
