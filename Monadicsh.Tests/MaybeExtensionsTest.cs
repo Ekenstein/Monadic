@@ -378,21 +378,37 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestOrNull()
+        public void TestOrDefaultReferenceType()
         {
             var value = new TestRef(1);
             var instance = Maybe.Just(value);
-            var result = instance.OrNull();
+            var result = instance.OrDefault();
             Assert.IsNotNull(result);
             Assert.AreEqual(value, result);
         }
 
         [Test]
-        public void TestOrNullNothing()
+        public void TestOrDefaultValueType()
+        {
+            var instance = Maybe.Just(1);
+            var result = instance.OrDefault();
+            Assert.AreEqual(1, result);
+        }
+
+        [Test]
+        public void TestOrDefaultNothingReferenceType()
         {
             var instance = Maybe<TestRef>.Nothing;
-            var result = instance.OrNull();
+            var result = instance.OrDefault();
             Assert.IsNull(result);
+        }
+
+        [Test]
+        public void TestOrDefaultNothingValueType()
+        {
+            var instance = Maybe<int>.Nothing;
+            var result = instance.OrDefault();
+            Assert.AreEqual(default(int), result);
         }
 
         [Test]
@@ -485,6 +501,62 @@ namespace Monadicsh.Tests
             var instance3 = Maybe.Just("test");
             var result3 = instance3.Cast<string, int>();
             result3.AssertNothing();
+
+            var instance4 = Maybe.Just(1);
+            var result4 = instance4.Cast<int, string>();
+            result4.AssertNothing();
+
+            instance4 = Maybe<int>.Nothing;
+            var result5 = instance4.Cast<int, float>();
+            result5.AssertNothing();
+        }
+
+        [Test]
+        public void TestDefaultIfNothingValueType()
+        {
+            {
+                var instance = Maybe.Just(1);
+                var result = instance.DefaultIfNothing();
+                result.AssertJust(1);
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                var result = instance.DefaultIfNothing();
+                result.AssertJust(0);
+            }
+        }
+
+        [Test]
+        public void TestDefaultIfNothing()
+        {
+            {
+                var instance = Maybe.Just("test");
+                var result = instance.DefaultIfNothing("nothing");
+                instance.AssertJust("test");
+            }
+            {
+                var instance = Maybe<string>.Nothing;
+                var result = instance.DefaultIfNothing("nothing");
+                result.AssertJust("nothing");
+            }
+            {
+                var instance = Maybe.Just("test");
+                Assert.Throws<ArgumentNullException>(() => instance.DefaultIfNothing(default(string)));
+            }
+            {
+                var instance = Maybe<string>.Nothing;
+                Assert.Throws<ArgumentNullException>(() => instance.DefaultIfNothing(default(string)));
+            }
+            {
+                var instance = Maybe.Just(1);
+                var result = instance.DefaultIfNothing(2);
+                result.AssertJust(1);
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                var result = instance.DefaultIfNothing(2);
+                result.AssertJust(2);
+            }
         }
 
         private class TestEqualityComparer : IEqualityComparer<string>

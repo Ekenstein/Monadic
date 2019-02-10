@@ -37,16 +37,56 @@ namespace Monadicsh.Extensions
         public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
 
         /// <summary>
-        /// Returns the value of the given <paramref name="maybe"/> or null if the maybe
+        /// Returns the value of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/> if the maybe
         /// is representing Nothing.
         /// </summary>
         /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
         /// <param name="maybe">The maybe that should have its value extracted from it.</param>
         /// <returns>
-        /// The value of the given <paramref name="maybe"/> or null if the maybe is representing Nothing.
+        /// The value of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/> if 
+        /// the maybe is representing Nothing.
         /// </returns>
-        public static T OrNull<T>(this Maybe<T> maybe) where T : class => maybe
+        public static T OrDefault<T>(this Maybe<T> maybe) => maybe
             .Or(() => default(T));
+
+        /// <summary>
+        /// Returns a <see cref="Maybe{T}"/> which will either represent the value
+        /// of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/>
+        /// if the given <paramref name="maybe"/> is Nothing.
+        /// </summary>
+        /// <typeparam name="T">The type that the maybe is encapsulating.</typeparam>
+        /// <param name="maybe">The maybe who's value should be extracted to a new maybe.</param>
+        /// <returns>
+        /// A <see cref="Maybe{T}"/> that will contain either the value of the given <paramref name="maybe"/>
+        /// or the default value of <typeparamref name="T"/> iff the given <paramref name="maybe"/> is Nothing.
+        /// </returns>
+        public static Maybe<T> DefaultIfNothing<T>(this Maybe<T> maybe) where T : struct
+        {
+            return maybe.DefaultIfNothing(default(T));
+        }
+
+        /// <summary>
+        /// Returns a <see cref="Maybe{T}"/> which will either represent the value of the given
+        /// <paramref name="maybe"/> or the given <paramref name="defaultValue"/> iff
+        /// the given <paramref name="maybe"/> is Nothing.
+        /// </summary>
+        /// <typeparam name="T">The type that the maybe is encapsulating.</typeparam>
+        /// <param name="maybe">The maybe who's value should be extracted to a new maybe.</param>
+        /// <param name="defaultValue">The default value to use if the maybe is Nothing.</param>
+        /// <returns>
+        /// A <see cref="Maybe{T}"/> that will contain either the value of the given <paramref name="maybe"/>
+        /// or the <paramref name="defaultValue"/> if the given <paramref name="maybe"/> is Nothing.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="defaultValue"/> is null.</exception>
+        public static Maybe<T> DefaultIfNothing<T>(this Maybe<T> maybe, T defaultValue) 
+        {
+            if (defaultValue == null)
+            {
+                throw new ArgumentNullException(nameof(defaultValue));
+            }
+
+            return maybe.Map(() => Maybe.Just(defaultValue), v => Maybe.Just(v));
+        }
 
         /// <summary>
         /// Returns either the value of the maybe mapped to the new type <typeparamref name="T2"/> or
@@ -110,7 +150,7 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static Maybe<T2> Cast<T1, T2>(this Maybe<T1> maybe)
         {
-            return Maybe.Try(() => maybe.Cast<T2>().SingleOrDefault());
+            return Maybe.Try(() => maybe.Cast<T2>().Single());
         }
 
         /// <summary>
