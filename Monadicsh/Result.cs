@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Monadicsh
 {
@@ -44,10 +45,11 @@ namespace Monadicsh
         /// </summary>
         /// <param name="errors">The errors that occurred during the operation.</param>
         /// <returns>A <see cref="Result"/> representing an operation that was unsuccessful.</returns>
+        /// <remarks>Will filter out all the errors that are null.</remarks>
         public static Result Failed(params Error[] errors) => new Result 
         { 
             Succeeded = false, 
-            Errors = errors ?? new Error[0]
+            Errors = errors?.Where(e => e != null).ToArray() ?? new Error[0]
         };
 
         /// <summary>
