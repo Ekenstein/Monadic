@@ -137,23 +137,6 @@ namespace Monadicsh.Extensions
             .Map(() => defaultValue, map);
 
         /// <summary>
-        /// Casts the value of the given <paramref name="maybe"/> from
-        /// <typeparamref name="T1"/> to <typeparamref name="T2"/>.
-        /// If the value of the maybe couldn't be casted to the new type, Nothing will be returned.
-        /// </summary>
-        /// <typeparam name="T1">The type of the value that the maybe is currently holding.</typeparam>
-        /// <typeparam name="T2">The type of value that the new maybe will be holding.</typeparam>
-        /// <param name="maybe">The maybe which the value of should be casted to a new type.</param>
-        /// <returns>
-        /// A maybe of type <typeparamref name="T2"/> which either represents Nothing if either
-        /// the value of the given maybe was Nothing or if the value of the maybe couldn't be casted to the new type.
-        /// </returns>
-        public static Maybe<T2> Cast<T1, T2>(this Maybe<T1> maybe)
-        {
-            return Maybe.Try(() => maybe.Cast<T2>().Single());
-        }
-
-        /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> or throws
         /// the exception produced by the given <paramref name="exceptionSelector"/> 
         /// iff the maybe represents Nothing.
@@ -283,7 +266,7 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static T? ToNullable<T>(this Maybe<T> maybe) where T : struct
         {
-            return maybe.Map(() => default(T?), v => v);
+            return maybe.Cast<T?>().OrDefault();
         }
 
         /// <summary>
@@ -558,6 +541,69 @@ namespace Monadicsh.Extensions
             }
 
             return maybe.Guard(v => equalityComparer.Equals(v, expectedValueSelector()));
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IComparable{T}"/> that can compare the given <paramref name="maybe"/>
+        /// with another maybe of type <typeparamref name="T"/>.
+        /// A default comparer will be created of the type <typeparamref name="T"/>.
+        /// <see cref="Maybe{T}.Nothing"/> is always regarded as a lesser value, then ordinary comparing
+        /// of <typeparamref name="T"/> will be made.
+        /// </summary>
+        /// <typeparam name="T">The type of value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to create an <see cref="IComparable{T}"/> of.</param>
+        /// <returns>
+        /// An <see cref="IComparable{T}"/> that makes it possible to compare the given <paramref name="maybe"/>
+        /// with another maybe of the same type <typeparamref name="T"/>.
+        /// </returns>
+        public static IComparable<Maybe<T>> AsComparable<T>(this Maybe<T> maybe) where T : IComparable<T>
+        {
+            return maybe.AsComparable(Comparer<T>.Create((x, y) => x.CompareTo(y)));
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IComparable{T}"/> that can compare the given <paramref name="maybe"/>
+        /// with another maybe of type <typeparamref name="T"/>.
+        /// The given <paramref name="comparer"/> will be used to compare the inner values of the maybes.
+        /// <see cref="Maybe{T}.Nothing"/> is always regarded as a lesser value, then ordinary comparing of
+        /// <typeparamref name="T"/> will be made using the <paramref name="comparer"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to create an <see cref="IComparable{T}"/> of.</param>
+        /// <param name="comparer">Comparer that can compare values of type <typeparamref name="T"/>.</param>
+        /// <returns>
+        /// An <see cref="IComparable{T}"/> that makes it possible to compare the given <paramref name="maybe"/>
+        /// with another maybe of the same type <typeparamref name="T"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown if the given <paramref name="comparer"/> is null.</exception>
+        public static IComparable<Maybe<T>> AsComparable<T>(this Maybe<T> maybe, IComparer<T> comparer)
+        {
+            if (comparer == null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            return new ComparableMaybe<T>(maybe, comparer);
+        }
+
+        private class ComparableMaybe<T> : IComparable<Maybe<T>>
+        {
+            private readonly Maybe<T> _self;
+            private readonly IComparer<T> _comparer;
+
+            public ComparableMaybe(Maybe<T> self, IComparer<T> comparer)
+            {
+                _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+                _self = self;
+            }
+
+            public int CompareTo(Maybe<T> other)
+            {
+                if (_self.IsNothing && other.IsNothing) return 0;
+                if (_self.IsNothing) return -1;
+                if (other.IsNothing) return 1;
+                return _comparer.Compare(_self.Value, other.Value);
+            }
         }
     }
 }

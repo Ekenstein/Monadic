@@ -524,34 +524,6 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestCast()
-        {
-            var instance = Maybe.Just(1);
-            var result = instance.Cast<int, int?>();
-            result.AssertJust(1);
-
-            instance = Maybe<int>.Nothing;
-            result = instance.Cast<int, int?>();
-            result.AssertNothing();
-
-            var instance2 = Maybe.Just((int?)1);
-            var result2 = instance2.Cast<int?, int>();
-            result2.AssertJust(1);
-
-            var instance3 = Maybe.Just("test");
-            var result3 = instance3.Cast<string, int>();
-            result3.AssertNothing();
-
-            var instance4 = Maybe.Just(1);
-            var result4 = instance4.Cast<int, string>();
-            result4.AssertNothing();
-
-            instance4 = Maybe<int>.Nothing;
-            var result5 = instance4.Cast<int, float>();
-            result5.AssertNothing();
-        }
-
-        [Test]
         public void TestDefaultIfNothingValueType()
         {
             {
@@ -596,6 +568,106 @@ namespace Monadicsh.Tests
                 var instance = Maybe<int>.Nothing;
                 var result = instance.DefaultIfNothing(2);
                 result.AssertJust(2);
+            }
+        }
+
+        [Test]
+        public void TestAsComparableValueComparableJust()
+        {
+            var instance = Maybe.Just(1);
+            var comparable = instance.AsComparable();
+
+            {
+                var other = Maybe<int>.Nothing;
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var other = Maybe.Just(1);
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var other = Maybe.Just(0);
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var other = Maybe.Just(2);
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [Test]
+        public void TestAsComparableValueComparableNothing()
+        {
+            var instance = Maybe<int>.Nothing;
+            var comparable = instance.AsComparable();
+            {
+                var other = Maybe<int>.Nothing;
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var other = Maybe.Just(-1);
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [Test]
+        public void TestAsComparableWithComparerNull()
+        {
+            var instance = Maybe.Just(1);
+            Assert.Throws<ArgumentNullException>(() => instance.AsComparable(null));
+        }
+
+        [Test]
+        public void TestAsComparableWithComparerJust()
+        {
+            var instance = Maybe<TestRef>.Just(new TestRef(0));
+
+            var comparer = Comparer<TestRef>.Create((x, y) => x.Value.CompareTo(y.Value));
+            var comparable = instance.AsComparable(comparer);
+            {
+                var other = Maybe<TestRef>.Nothing;
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var other = Maybe<TestRef>.Just(new TestRef(0));
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var other = Maybe<TestRef>.Just(new TestRef(-1));
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var other = Maybe<TestRef>.Just(new TestRef(1));
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [Test]
+        public void TestAsComparableWithComparerNothing()
+        {
+            var instance = Maybe<TestRef>.Nothing;
+
+            var comparer = Comparer<TestRef>.Create((x, y) => x.Value.CompareTo(y.Value));
+            var comparable = instance.AsComparable(comparer);
+            {
+                var other = Maybe<TestRef>.Nothing;
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var other = Maybe<TestRef>.Just(new TestRef(-1));
+                var result = comparable.CompareTo(other);
+                Assert.AreEqual(-1, result);
             }
         }
 

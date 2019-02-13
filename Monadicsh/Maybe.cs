@@ -93,6 +93,55 @@ namespace Monadicsh
             
             return Create(value);
         }
+
+        /// <summary>
+        /// Creates an <see cref="IComparer{T}"/> that can compare two <see cref="Maybe{T}"/>.
+        /// <see cref="Maybe{T}.Nothing"/> is always regarded as a lesser value but a comparison
+        /// between two <see cref="Maybe{T}.Nothing"/> is always regarded as equal. Then an ordinary comparison
+        /// between the values of the maybes will be performed.
+        /// </summary>
+        /// <typeparam name="T">The type of value that the two maybes will have.</typeparam>
+        /// <returns>
+        /// An <see cref="IComparer{T}"/> that can compare two <see cref="Maybe{T}"/>.
+        /// </returns>
+        public static IComparer<Maybe<T>> Comparer<T>() where T : IComparable<T>
+        {
+            return System.Collections.Generic
+                .Comparer<Maybe<T>>
+                .Create(Compare);
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IComparer{T}"/> that can compare two <see cref="Maybe{T}"/>, using the
+        /// given <paramref name="comparer"/> as a comparer for the inner values of the maybes.
+        /// <see cref="Maybe{T}.Nothing"/> is always regarded as a lesser value but a comparison
+        /// between two <see cref="Maybe{T}.Nothing"/> is always regarded as equal. Then a comparison
+        /// with the given <paramref name="comparer"/> will be used to compare the inner values of the maybes.
+        /// </summary>
+        /// <typeparam name="T">The type of value that the two maybes will have.</typeparam>
+        /// <returns>
+        /// An <see cref="IComparer{T}"/> that can compare two <see cref="Maybe{T}"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="comparer"/> is null.</exception>
+        public static IComparer<Maybe<T>> Comparer<T>(IComparer<T> comparer)
+        {
+            if (comparer == null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            return System.Collections.Generic
+                .Comparer<Maybe<T>>
+                .Create((x, y) => Compare(x, y, comparer));
+        }
+
+        private static int Compare<T>(Maybe<T> x, Maybe<T> y) where T : IComparable<T> => x
+            .AsComparable()
+            .CompareTo(y);
+
+        private static int Compare<T>(Maybe<T> x, Maybe<T> y, IComparer<T> comparer) => x
+            .AsComparable(comparer)
+            .CompareTo(y);
     }
 
     /// <summary>
@@ -125,6 +174,22 @@ namespace Monadicsh
         /// Creates an <see cref="Maybe{T}"/> representing Nothing.
         /// </summary>
         public static Maybe<T> Nothing => new Maybe<T>(new T[0]);
+
+        /// <summary>
+        /// Casts the value of the current maybe of type to <typeparamref name="T2"/>.
+        /// If either the current maybe is Nothing or that the value couldn't be casted to the new type, 
+        /// Nothing will be returned.
+        /// </summary>
+        /// <typeparam name="T2">The type of value that the new maybe will be holding.</typeparam>
+        /// <returns>
+        /// A maybe of type <typeparamref name="T2"/> which either represents Nothing if either
+        /// the value of the current maybe was Nothing or if the value of the current maybe couldn't be casted to the new type.
+        /// </returns>
+        public Maybe<T2> Cast<T2>()
+        {
+            var self = this;
+            return Maybe.Try(() => self.OfType<T2>().Single());
+        }
 
         private Maybe(IEnumerable<T> item)
         {
