@@ -280,7 +280,7 @@ namespace Monadicsh.Extensions
         /// maybes where the maybe must contain a value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="maybes"/> is null.</exception>
-        public static IEnumerable<T> Just<T>(this IEnumerable<Maybe<T>> maybes) => maybes
+        public static IEnumerable<T> AllJust<T>(this IEnumerable<Maybe<T>> maybes) => maybes
             .Where(m => m.IsJust)
             .Select(m => m.Value);
 

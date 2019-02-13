@@ -17,7 +17,7 @@ namespace Monadicsh.Tests
                 Maybe<int>.Nothing
             };
 
-            var result = maybes.Just().ToArray();
+            var result = maybes.AllJust().ToArray();
             Assert.AreEqual(1, result.Length);
             Assert.Contains(1, result);
         }
@@ -31,7 +31,7 @@ namespace Monadicsh.Tests
                 Maybe<int>.Nothing
             };
 
-            var result = maybes.Just().ToArray();
+            var result = maybes.AllJust().ToArray();
             Assert.IsEmpty(result);
         }
 
@@ -44,7 +44,7 @@ namespace Monadicsh.Tests
                 Maybe.Create(2)
             };
 
-            var result = maybes.Just().ToArray();
+            var result = maybes.AllJust().ToArray();
             Assert.AreEqual(2, result.Length);
             Assert.Contains(1, result);
             Assert.Contains(2, result);
@@ -54,7 +54,7 @@ namespace Monadicsh.Tests
         public void TestJustEmpty()
         {
             var maybes = new Maybe<int>[0];
-            var result = maybes.Just().ToArray();
+            var result = maybes.AllJust().ToArray();
             Assert.IsEmpty(result);
         }
 
