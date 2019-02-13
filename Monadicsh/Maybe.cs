@@ -266,7 +266,9 @@ namespace Monadicsh
         /// <summary>
         /// Returns a hash code for this instance of <see cref="Maybe{T}"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// The hash code for this instance of <see cref="Maybe{T}"/>.
+        /// </returns>
         public override int GetHashCode()
         {
             unchecked
