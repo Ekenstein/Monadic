@@ -392,7 +392,7 @@ namespace Monadicsh.Extensions
         /// the result will be unsuccessful and will contain the errors produced by the given <paramref name="errorSelector"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="errorSelector"/> is null.</exception>
-        public static Result<T> ToResult<T>(this Maybe<T> maybe, Func<IEnumerable<Error>> errorSelector)
+        public static Result<T> AsResult<T>(this Maybe<T> maybe, Func<IEnumerable<Error>> errorSelector)
         {
             if (errorSelector == null)
             {
@@ -414,8 +414,8 @@ namespace Monadicsh.Extensions
         /// A <see cref="Result{T}"/> which is successful if the maybe represents a value, otherwise
         /// the result will be unsuccessful and will contain the given <paramref name="errors"/>.
         /// </returns>
-        public static Result<T> ToResult<T>(this Maybe<T> maybe, params Error[] errors) => maybe
-            .ToResult(() => errors);
+        public static Result<T> AsResult<T>(this Maybe<T> maybe, params Error[] errors) => maybe
+            .AsResult(() => errors);
 
         /// <summary>
         /// Checks whether the value of the given <paramref name="maybe"/> is valid or not by using

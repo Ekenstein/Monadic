@@ -337,10 +337,10 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestToResultJust()
+        public void TestAsResultJust()
         {
             var instance = Maybe.Create(1);
-            var result = instance.ToResult(() => new[]
+            var result = instance.AsResult(() => new[]
             {
                 new Error
                 {
@@ -353,7 +353,7 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestToResultNothing()
+        public void TestAsResultNothing()
         {
             var errors = new[]
             {
@@ -362,58 +362,58 @@ namespace Monadicsh.Tests
             };
 
             var instance = Maybe<int>.Nothing;
-            var result = instance.ToResult(() => errors);
+            var result = instance.AsResult(() => errors);
             result.AssertFailed(errors);
         }
 
         [Test]
-        public void TestToResultNothingNullErrors()
+        public void TestAsResultNothingNullErrors()
         {
             var instance = Maybe<int>.Nothing;
-            var result = instance.ToResult(() => null);
+            var result = instance.AsResult(() => null);
             result.AssertFailed(new Error[0]);
         }
 
         [Test]
-        public void TestToResultNull()
+        public void TestAsResultNull()
         {
             var instance = Maybe<int>.Nothing;
-            Assert.Throws<ArgumentNullException>(() => instance.ToResult(default(Func<IEnumerable<Error>>)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsResult(default(Func<IEnumerable<Error>>)));
 
             instance = Maybe.Just(1);
-            Assert.Throws<ArgumentNullException>(() => instance.ToResult(default(Func<IEnumerable<Error>>)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsResult(default(Func<IEnumerable<Error>>)));
         }
 
         [Test]
-        public void TestToResultParamsJust()
+        public void TestAsResultParamsJust()
         {
             var instance = Maybe.Just(1);
-            var result = instance.ToResult(new Error("test", "testing"), new Error("test2", "testing2"));
+            var result = instance.AsResult(new Error("test", "testing"), new Error("test2", "testing2"));
             result.AssertSuccess(1);
         }
 
         [Test]
-        public void TestToResultParamsNothing()
+        public void TestAsResultParamsNothing()
         {
             var error = new Error("test", "testing");
             var instance = Maybe<int>.Nothing;
-            var result = instance.ToResult(error);
+            var result = instance.AsResult(error);
             result.AssertFailed(new [] {error});
         }
 
         [Test]
-        public void TestToResultParamsJustNull()
+        public void TestAsResultParamsJustNull()
         {
             var instance = Maybe.Just(1);
-            var result = instance.ToResult(default(Error[]));
+            var result = instance.AsResult(default(Error[]));
             result.AssertSuccess(1);
         }
 
         [Test]
-        public void TestToResultParamsNothingNull()
+        public void TestAsResultParamsNothingNull()
         {
             var instance = Maybe<int>.Nothing;
-            var result = instance.ToResult(default(Error[]));
+            var result = instance.AsResult(default(Error[]));
             result.AssertFailed(new Error[0]);
         }
 
