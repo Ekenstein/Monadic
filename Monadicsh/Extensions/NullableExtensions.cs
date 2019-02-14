@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Monadicsh.Extensions
 {
@@ -31,6 +32,10 @@ namespace Monadicsh.Extensions
         /// <returns>
         /// An <see cref="IEnumerable{T}"/> containing zero or exactly one element which is the extracted <paramref name="value"/>.
         /// </returns>
-        public static IEnumerable<T> AsEnumerable<T>(this T? value) where T : struct => value.AsMaybe();
+        public static IEnumerable<T> AsEnumerable<T>(this T? value) where T : struct
+        {
+            if (value.HasValue) return new [] { value.Value };
+            return new T[0];
+        }
     }
 }
