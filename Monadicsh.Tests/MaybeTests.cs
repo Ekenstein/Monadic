@@ -322,6 +322,96 @@ namespace Monadicsh.Tests
             }
         }
 
+        [Test]
+        public void TestCompareValueType()
+        {
+            {
+                var x = Maybe<int>.Nothing;
+                var y = Maybe<int>.Nothing;
+
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var x = Maybe<int>.Nothing;
+                var y = Maybe.Just(1);
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(-1, result);
+            }
+            {
+                var x = Maybe<int>.Just(1);
+                var y = Maybe<int>.Nothing;
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var x = Maybe<int>.Just(1);
+                var y = Maybe<int>.Just(1);
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var x = Maybe<int>.Just(2);
+                var y = Maybe<int>.Just(1);
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var x = Maybe<int>.Just(1);
+                var y = Maybe<int>.Just(2);
+                var result = Maybe.Compare(x, y);
+                Assert.AreEqual(-1, result);
+            }
+        }
+
+        [Test]
+        public void TestCompareReferenceType()
+        {
+            Assert.Throws<ArgumentNullException>(() => Maybe.Compare(Maybe<int>.Nothing, Maybe<int>.Nothing, null));
+            Assert.Throws<ArgumentNullException>(() => Maybe.Compare(Maybe.Just(1), Maybe<int>.Nothing, null));
+            Assert.Throws<ArgumentNullException>(() => Maybe.Compare(Maybe.Just(1), Maybe<int>.Just(1), null));
+            Assert.Throws<ArgumentNullException>(() => Maybe.Compare(Maybe<int>.Nothing, Maybe<int>.Just(1), null));
+            
+            var valueComparer = Comparer<TestRef>.Create((x, y) => x.Value.CompareTo(y.Value));
+            {
+                var x = Maybe<TestRef>.Nothing;
+                var y = Maybe<TestRef>.Nothing;
+
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var x = Maybe<TestRef>.Nothing;
+                var y = Maybe.Just(new TestRef(1));
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(-1, result);
+            }
+            {
+                var x = Maybe<TestRef>.Just(new TestRef(1));
+                var y = Maybe<TestRef>.Nothing;
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var x = Maybe<TestRef>.Just(new TestRef(1));
+                var y = Maybe<TestRef>.Just(new TestRef(1));
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(0, result);
+            }
+            {
+                var x = Maybe<TestRef>.Just(new TestRef(2));
+                var y = Maybe<TestRef>.Just(new TestRef(1));
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(1, result);
+            }
+            {
+                var x = Maybe<TestRef>.Just(new TestRef(1));
+                var y = Maybe<TestRef>.Just(new TestRef(2));
+                var result = Maybe.Compare(x, y, valueComparer);
+                Assert.AreEqual(-1, result);
+            }
+        }
+
         private class TestRef 
         {
             public TestRef() { }

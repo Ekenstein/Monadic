@@ -59,19 +59,19 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestToNullableJust()
+        public void TestAsNullableJust()
         {
             var instance = Maybe.Just(1);
-            var result = instance.ToNullable();
+            var result = instance.AsNullable();
             Assert.True(result.HasValue);
             Assert.AreEqual(1, result.Value);
         }
 
         [Test]
-        public void TestToNullableNothing()
+        public void TestAsNullableNothing()
         {
             var instance = Maybe<int>.Nothing;
-            var result = instance.ToNullable();
+            var result = instance.AsNullable();
             Assert.False(result.HasValue);
         }
 
@@ -111,64 +111,64 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestToEitherRight()
+        public void TestAsEitherRight()
         {
             var instance = Maybe.Just(1);
-            var value = instance.ToEither(2);
+            var value = instance.AsEither(2);
             value.AssertRight(1);
         }
 
         [Test]
-        public void TestToEitherLeft()
+        public void TestAsEitherLeft()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.ToEither(1);
+            var value = instance.AsEither(1);
             value.AssertLeft(1);
         }
 
         [Test]
-        public void TestToEitherLeftNull()
+        public void TestAsEitherLeftNull()
         {
             var instance = Maybe<string>.Nothing;
-            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(string)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsEither(default(string)));
         }
     
         [Test]
-        public void TestToEitherRightNull()
+        public void TestAsEitherRightNull()
         {
             var instance = Maybe.Just("test");
-            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(string)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsEither(default(string)));
         }
 
         [Test]
-        public void TestToEitherFuncRight()
+        public void TestAsEitherFuncRight()
         {
             var instance = Maybe.Just(1);
-            var value = instance.ToEither(() => 2);
+            var value = instance.AsEither(() => 2);
             value.AssertRight(1);
         }
 
         [Test]
-        public void TestToEitherFuncLeft()
+        public void TestAsEitherFuncLeft()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.ToEither(() => 2);
+            var value = instance.AsEither(() => 2);
             value.AssertLeft(2);
         }
 
         [Test]
-        public void TestToEitherFuncLeftNull()
+        public void TestAsEitherFuncLeftNull()
         {
             var instance = Maybe<string>.Nothing;
-            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(Func<string>)));
-            Assert.Throws<ArgumentNullException>(() => instance.ToEither(() => default(string)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsEither(default(Func<string>)));
+            Assert.Throws<ArgumentNullException>(() => instance.AsEither(() => default(string)));
         }
 
-        public void TestToEitherFuncRightNull()
+        public void TestAsEitherFuncRightNull()
         {
             var instance = Maybe.Just("test");
-            Assert.Throws<ArgumentNullException>(() => instance.ToEither(default(Func<string>)));
-            var result = instance.ToEither(() => default(string));
+            Assert.Throws<ArgumentNullException>(() => instance.AsEither(default(Func<string>)));
+            var result = instance.AsEither(() => default(string));
             result.AssertRight("test");
         }
 

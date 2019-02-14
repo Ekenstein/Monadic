@@ -174,7 +174,7 @@ namespace Monadicsh.Extensions
         /// otherwise the right side will be populated by the value of the maybe.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null or the value produced by the value selector is null.</exception>
-        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, Func<T1> defaultValueSelector)
+        public static Either<T1, T2> AsEither<T1, T2>(this Maybe<T2> maybe, Func<T1> defaultValueSelector)
         {
             if (defaultValueSelector == null)
             {
@@ -199,14 +199,14 @@ namespace Monadicsh.Extensions
         /// otherwise the right side will be populated by the value of the maybe.
         /// </returns>
         /// <exception cref="ArgumentNullException">If the given <paramref name="defaultValue"/> is null.</exception>
-        public static Either<T1, T2> ToEither<T1, T2>(this Maybe<T2> maybe, T1 defaultValue)
+        public static Either<T1, T2> AsEither<T1, T2>(this Maybe<T2> maybe, T1 defaultValue)
         {
             if (defaultValue == null)
             {
                 throw new ArgumentNullException(nameof(defaultValue));
             }
 
-            return maybe.ToEither(() => defaultValue);
+            return maybe.AsEither(() => defaultValue);
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace Monadicsh.Extensions
         /// A <see cref="Nullable{T}"/> of type <typeparamref name="T"/> which will be null
         /// if the given <paramref name="maybe"/> is Nothing, otherwise a non-null value.
         /// </returns>
-        public static T? ToNullable<T>(this Maybe<T> maybe) where T : struct
+        public static T? AsNullable<T>(this Maybe<T> maybe) where T : struct
         {
             return maybe.Cast<T?>().OrDefault();
         }
@@ -558,7 +558,7 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static IComparable<Maybe<T>> AsComparable<T>(this Maybe<T> maybe) where T : IComparable<T>
         {
-            return maybe.AsComparable(Comparer<T>.Create((x, y) => x.CompareTo(y)));
+            return new ComparableMaybe<T>(other => Maybe.Compare(maybe, other));
         }
 
         /// <summary>
@@ -583,27 +583,16 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            return new ComparableMaybe<T>(maybe, comparer);
+            return new ComparableMaybe<T>(other => Maybe.Compare(maybe, other, comparer));
         }
 
         private class ComparableMaybe<T> : IComparable<Maybe<T>>
         {
-            private readonly Maybe<T> _self;
-            private readonly IComparer<T> _comparer;
+            private readonly Func<Maybe<T>, int> _compare;
 
-            public ComparableMaybe(Maybe<T> self, IComparer<T> comparer)
-            {
-                _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
-                _self = self;
-            }
+            public ComparableMaybe(Func<Maybe<T>, int> compare) => _compare = compare;
 
-            public int CompareTo(Maybe<T> other)
-            {
-                if (_self.IsNothing && other.IsNothing) return 0;
-                if (_self.IsNothing) return -1;
-                if (other.IsNothing) return 1;
-                return _comparer.Compare(_self.Value, other.Value);
-            }
+            public int CompareTo(Maybe<T> other) => _compare(other);
         }
     }
 }

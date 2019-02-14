@@ -135,13 +135,55 @@ namespace Monadicsh
                 .Create((x, y) => Compare(x, y, comparer));
         }
 
-        private static int Compare<T>(Maybe<T> x, Maybe<T> y) where T : IComparable<T> => x
-            .AsComparable()
-            .CompareTo(y);
+        /// <summary>
+        /// Compares <paramref name="x"/> with <paramref name="y"/> and returns
+        /// an integer that indicates their relative position in the sort order.
+        /// If both maybes contains a value, the values of the maybes will be compared
+        /// by <see cref="IComparable{T}.CompareTo(T)"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value both maybes are holding.</typeparam>
+        /// <param name="x">The first maybe.</param>
+        /// <param name="y">The second maybe.</param>
+        /// <returns>
+        /// An integer that indicates their relative position in the sort order.
+        /// A <see cref="Maybe{T}.Nothing"/> is always considered to be less than another non-nothing maybe,
+        /// but two maybes that represents Nothing are considered to be equal.
+        /// If both maybes represents a value, the comparison of the values will be performed by <see cref="IComparable{T}.CompareTo(T)"/>.
+        /// </returns>
+        public static int Compare<T>(Maybe<T> x, Maybe<T> y) where T : IComparable<T>
+        {
+            return Compare(x, y, System.Collections.Generic.Comparer<T>.Create((xv, yv) => xv.CompareTo(yv)));
+        }
 
-        private static int Compare<T>(Maybe<T> x, Maybe<T> y, IComparer<T> comparer) => x
-            .AsComparable(comparer)
-            .CompareTo(y);
+        /// <summary>
+        /// Compares <paramref name="x"/> with <paramref name="y"/> and returns
+        /// an integer that indicates their relative position in the sort order.
+        /// The given <paramref name="comparer"/> will be used to compare the inner values
+        /// of both maybes.
+        /// </summary>
+        /// <typeparam name="T">The type of value both maybes are holding.</typeparam>
+        /// <param name="x">The first maybe.</param>
+        /// <param name="y">The second maybe.</param>
+        /// <param name="comparer">The comparer used to compare the inner values of the maybes.</param>
+        /// <returns>
+        /// An integer that indicates their relative position in the sort order.
+        /// A <see cref="Maybe{T}.Nothing"/> is always considered to be less than another non-nothing maybe,
+        /// but two maybes that represents Nothing are considered to be equal.
+        /// If both maybes represents a value, the comparison of the values will be performed with the given <paramref name="comparer"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If the given <paramref name="comparer"/> is null.</exception>
+        public static int Compare<T>(Maybe<T> x, Maybe<T> y, IComparer<T> comparer)
+        {
+            if (comparer == null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            if (x.IsNothing && y.IsNothing) return 0;
+            if (x.IsNothing) return -1;
+            if (y.IsNothing) return 1;
+            return comparer.Compare(x.Value, y.Value);
+        }
     }
 
     /// <summary>
