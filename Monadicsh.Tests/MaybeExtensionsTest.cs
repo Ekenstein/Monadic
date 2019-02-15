@@ -675,7 +675,10 @@ namespace Monadicsh.Tests
         public void TestAsEnumerable()
         {
             var instance = Maybe.Just(1);
-            Assert.AreEqual(1, instance.AsEnumerable().Count());
+            var result = instance.AsEnumerable().ToArray();
+            Assert.AreEqual(1, result.Length);
+            var value = result.Single();
+            Assert.AreEqual(instance.Value, value);
 
             instance = Maybe<int>.Nothing;
             Assert.IsEmpty(instance.AsEnumerable());
