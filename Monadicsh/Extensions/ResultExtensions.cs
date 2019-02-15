@@ -35,19 +35,8 @@ namespace Monadicsh.Extensions
         /// Either a successful result if both results were successful, or an unsuccessful result
         /// if either the inner or outer result was unsuccessful.
         /// </returns>
-        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outer"/> is null.</exception>
         public static Result And(this Result inner, Result outer)
         {
-            if (inner == null)
-            {
-                throw new ArgumentNullException(nameof(inner));
-            }
-
-            if (outer == null)
-            {
-                throw new ArgumentNullException(nameof(outer));
-            }
-
             if (inner.Succeeded && outer.Succeeded)
             {
                 return Result.Success;
@@ -73,19 +62,8 @@ namespace Monadicsh.Extensions
         /// A successful result if either the inner or outer result was successful, otherwise
         /// an unsuccessful result containing errors from both results.
         /// </returns>
-        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outer"/> is null.</exception>
         public static Result Or(this Result inner, Result outer)
         {
-            if (inner == null)
-            {
-                throw new ArgumentNullException(nameof(inner));
-            }
-
-            if (outer == null)
-            {
-                throw new ArgumentNullException(nameof(outer));
-            }
-
             return inner.Or(() => outer);
         }
 
@@ -101,14 +79,9 @@ namespace Monadicsh.Extensions
         /// A <see cref="Result"/> where a successful result means that one or both results were successful.
         /// If both results were failed, a failed result will be returned containing both of the results' errors.
         /// </returns>
-        /// <exception cref="ArgumentNullException">If either <paramref name="inner"/> or <paramref name="outerSelector"/> is null.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="outerSelector"/> is null.</exception>
         public static Result Or(this Result inner, Func<Result> outerSelector)
         {
-            if (inner == null)
-            {
-                throw new ArgumentNullException(nameof(inner));
-            }
-
             if (outerSelector == null)
             {
                 throw new ArgumentNullException(nameof(outerSelector));

@@ -112,15 +112,6 @@ namespace Monadicsh.Tests
             AssertFailed(testCase, result);
         }
 
-        [Test]
-        public void TestOrFuncArgumentNull()
-        {
-            Assert.Throws<ArgumentNullException>(() => default(Result).Or(() => Result.Success));
-            Assert.Throws<ArgumentNullException>(() => default(Result).Or(default(Func<Result>)));
-            Assert.Throws<ArgumentNullException>(() => Result.Failed().Or(default(Func<Result>)));
-            Assert.Throws<ArgumentNullException>(() => Result.Success.Or(default(Func<Result>)));
-        }
-
         [TestCaseSource(nameof(ResultsThatAreMixed))]
         public void TestAndFailed((Result, Result) testCase)
         {

@@ -73,6 +73,13 @@ namespace Monadicsh.Tests
         }
 
         [Test]
+        public void TestDefault()
+        {
+            var instance = default(Result);
+            instance.AssertFailed(new Error[0]);
+        }
+
+        [Test]
         public void TestFailedErrorsNull()
         {
             var instance = Result.Failed(null);
