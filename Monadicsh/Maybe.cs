@@ -191,7 +191,7 @@ namespace Monadicsh
     /// (represented as Just <see cref="!:T" />), or it is empty (represented as Nothing).
     /// </summary>
     /// <typeparam name="T">The type of value the Maybe is wrapping.</typeparam>
-    public struct Maybe<T> : IEquatable<Maybe<T>>, IEnumerable<T>
+    public struct Maybe<T> : IEquatable<Maybe<T>>
     {
         private readonly IEnumerable<T> _item;
 
@@ -230,7 +230,7 @@ namespace Monadicsh
         public Maybe<T2> Cast<T2>()
         {
             var self = this;
-            return Maybe.Try(() => self.OfType<T2>().Single());
+            return Maybe.Try(() => self.AsEnumerable().OfType<T2>().Single());
         }
 
         private Maybe(IEnumerable<T> item)
@@ -318,17 +318,5 @@ namespace Monadicsh
                 return IsNothing ? 0 : Value.GetHashCode() * 397;
             }
         }
-
-        /// <summary>
-        /// Returns an enumerator representing the Maybe. If the maybe represents
-        /// Just a value, the enumerator will contain exactly one element. If the maybe
-        /// represents Nothing, the enumerator will contain no elements.
-        /// </summary>
-        /// <returns>
-        /// An <see cref="IEnumerator{T}"/> that contains either zero or one element.
-        /// </returns>
-        public IEnumerator<T> GetEnumerator() => _item?.GetEnumerator() ?? Enumerable.Empty<T>().GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

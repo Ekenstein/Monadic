@@ -671,6 +671,19 @@ namespace Monadicsh.Tests
             }
         }
 
+        [Test]
+        public void TestAsEnumerable()
+        {
+            var instance = Maybe.Just(1);
+            Assert.AreEqual(1, instance.AsEnumerable().Count());
+
+            instance = Maybe<int>.Nothing;
+            Assert.IsEmpty(instance.AsEnumerable());
+
+            instance = default(Maybe<int>);
+            Assert.IsEmpty(instance.AsEnumerable());
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);

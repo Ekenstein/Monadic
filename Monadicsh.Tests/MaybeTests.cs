@@ -179,19 +179,6 @@ namespace Monadicsh.Tests
         }
 
         [Test]
-        public void TestEnumerable()
-        {
-            var instance = Maybe.Just(1);
-            Assert.AreEqual(1, instance.Count());
-
-            instance = Maybe<int>.Nothing;
-            Assert.IsEmpty(instance);
-
-            instance = default(Maybe<int>);
-            Assert.IsEmpty(instance);
-        }
-
-        [Test]
         public void TestTry()
         {
             var instance = Maybe.Try(() => "test");

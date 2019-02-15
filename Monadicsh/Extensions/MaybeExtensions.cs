@@ -586,6 +586,21 @@ namespace Monadicsh.Extensions
             return new ComparableMaybe<T>(other => Maybe.Compare(maybe, other, comparer));
         }
 
+        /// <summary>
+        /// Converts the given <paramref name="maybe"/> to an <see cref="IEnumerable{T}"/>.
+        /// If the <paramref name="maybe"/> is <see cref="Maybe{T}.Nothing"/>, an empty collection will be returned, otherwise
+        /// a collection containing the value of the maybe.
+        /// </summary>
+        /// <typeparam name="T">The type of value that the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to transform into an <see cref="IEnumerable{T}"/>.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> containing zero or exactly one element which is the extracted value of the <paramref name="maybe"/>.
+        /// </returns>
+        public static IEnumerable<T> AsEnumerable<T>(this Maybe<T> maybe)
+        {
+            return maybe.Map(Enumerable.Empty<T>, v => new [] { v });
+        }
+
         private class ComparableMaybe<T> : IComparable<Maybe<T>>
         {
             private readonly Func<Maybe<T>, int> _compare;
