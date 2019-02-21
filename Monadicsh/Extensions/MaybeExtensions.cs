@@ -627,6 +627,42 @@ namespace Monadicsh.Extensions
             maybe.AsEither(() => 1).DoEither(_ => nothing(), v => just(v));
         }
 
+        /// <summary>
+        /// Invokes the given action <paramref name="just"/> iff the given <paramref name="maybe"/>
+        /// is representing a value.
+        /// </summary>
+        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to extract the value of and perform a function of.</param>
+        /// <param name="just">The function to invoke with the maybe's value.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="just"/> is null.</exception>
+        public static void CaseJust<T>(this Maybe<T> maybe, Action<T> just)
+        {
+            if (just == null)
+            {
+                throw new ArgumentNullException(nameof(just));
+            }
+
+            maybe.Case(just, () => { });
+        }
+
+        /// <summary>
+        /// Invokes the given action <paramref name="nothing"/> iff the given <paramref name="maybe"/>
+        /// is representing nothing.
+        /// </summary>
+        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe that may or may not represent a value.</param>
+        /// <param name="nothing">The function to invoke iff the maybe is representing nothing.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="nothing"/> is null.</exception>
+        public static void CaseNothing<T>(this Maybe<T> maybe, Action nothing)
+        {
+            if (nothing == null)
+            {
+                throw new ArgumentNullException(nameof(nothing));
+            }
+
+            maybe.Case(_ => { }, nothing);
+        }
+
         private class ComparableMaybe<T> : IComparable<Maybe<T>>
         {
             private readonly Func<Maybe<T>, int> _compare;

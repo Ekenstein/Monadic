@@ -706,6 +706,40 @@ namespace Monadicsh.Tests
             }
         }
 
+        [Test]
+        public void TestCaseJust()
+        {
+            {
+                var instance = Maybe.Just(1);
+                instance.CaseJust(v => Assert.AreEqual(1, v));
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                instance.CaseJust(v => Assert.Fail());
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                Assert.Throws<ArgumentNullException>(() => instance.CaseJust(default(Action<int>)));
+            }
+        }
+
+        [Test]
+        public void TestCaseNothing()
+        {
+            {
+                var instance = Maybe.Just(1);
+                instance.CaseNothing(() => Assert.Fail());
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                instance.CaseNothing(() => Assert.Pass());
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                Assert.Throws<ArgumentNullException>(() => instance.CaseNothing(default(Action)));
+            }
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);
