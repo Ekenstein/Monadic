@@ -687,6 +687,25 @@ namespace Monadicsh.Tests
             Assert.IsEmpty(instance.AsEnumerable());
         }
 
+        [Test]
+        public void TestCase()
+        {
+            {
+                var instance = Maybe.Just(1);
+                instance.Case(v => Assert.AreEqual(1, v), () => Assert.Fail("Nothing function was invoked even though the maybe is representing a value."));
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                instance.Case(v => Assert.Fail("Just function was invoked even though the maybe is representing nothing."), () => Assert.Pass());
+            }
+            {
+                var instance = Maybe<int>.Nothing;
+                Assert.Throws<ArgumentNullException>(() => instance.Case(default(Action<int>), default(Action)));
+                Assert.Throws<ArgumentNullException>(() => instance.Case(default(Action<int>), () => Assert.Fail()));
+                Assert.Throws<ArgumentNullException>(() => instance.Case(v => Assert.Fail(), default(Action)));
+            }
+        }
+
         private class TestEqualityComparer : IEqualityComparer<string>
         {
             public bool Equals(string x, string y) => string.Equals(x, y);

@@ -601,6 +601,32 @@ namespace Monadicsh.Extensions
             return maybe.Map(Enumerable.Empty<T>, v => new [] { v });
         }
 
+        /// <summary>
+        /// Will perform one of the given functions depending on whether the <paramref name="maybe"/>
+        /// represents a value or nothing.
+        /// If the maybe represents a value, <paramref name="just"/> will be invoked with the value of
+        /// the maybe, otherwise <paramref name="nothing"/> will be invoked.
+        /// </summary>
+        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe to perform either the just function or the nothing function on.</param>
+        /// <param name="just">The function that will be invoked if the maybe is representing a value.</param>
+        /// <param name="nothing">The function that will be invoked if the maybe is representing nothing.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="just"/> or <paramref name="nothing"/> is null.</exception>
+        public static void Case<T>(this Maybe<T> maybe, Action<T> just, Action nothing)
+        {
+            if (just == null)
+            {
+                throw new ArgumentNullException(nameof(just));
+            }
+
+            if (nothing == null)
+            {
+                throw new ArgumentNullException(nameof(nothing));
+            }
+
+            maybe.AsEither(() => 1).DoEither(_ => nothing(), v => just(v));
+        }
+
         private class ComparableMaybe<T> : IComparable<Maybe<T>>
         {
             private readonly Func<Maybe<T>, int> _compare;
