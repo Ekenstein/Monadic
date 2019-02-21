@@ -11,29 +11,67 @@ namespace Monadicsh.Tests
         public void TestFromLeft()
         {
             var instance = new Either<int, string>(1);
-            var result = instance.FromLeft(0);
+            var result = instance.LeftOrDefault(0);
             Assert.AreEqual(1, result);
         }
 
         [Test]
-        public void TestFromLeftDefaultValue()
+        public void TestLeftOrDefault()
+        {
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.LeftOrDefault();
+                Assert.AreEqual(0, result);
+            }
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.LeftOrDefault();
+                Assert.AreEqual(1, result);
+            }
+            {
+                Either<int, string> instance = null;
+                Assert.Throws<ArgumentNullException>(() => instance.LeftOrDefault());
+            }
+        }
+
+        [Test]
+        public void TestRightOrDefault()
+        {
+            {
+                var instance = new Either<string, int>(1);
+                var result = instance.RightOrDefault();
+                Assert.AreEqual(1, result);
+            }
+            {
+                var instance = new Either<string, int>("test");
+                var result = instance.RightOrDefault();
+                Assert.AreEqual(0, result);
+            }
+            {
+                Either<string, int> instance = null;
+                Assert.Throws<ArgumentNullException>(() => instance.RightOrDefault());
+            }
+        }
+
+        [Test]
+        public void TestLeftOrDefaultDefaultValue()
         {
             var instance = new Either<int, string>("test");
-            var result = instance.FromLeft(1);
+            var result = instance.LeftOrDefault(1);
             Assert.AreEqual(1, result);
         }
 
         [Test]
         public void TestFromLeftArgumentNull()
         {
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).FromLeft(1));
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).LeftOrDefault(1));
         }
 
         [Test]
         public void TestFromLeftFunc()
         {
             var instance = new Either<int, string>(1);
-            var result = instance.FromLeft(() => 0);
+            var result = instance.LeftOrDefault(() => 0);
             Assert.AreEqual(1, result);
         }
 
@@ -41,7 +79,7 @@ namespace Monadicsh.Tests
         public void TestFromLeftFuncDefaultValue()
         {
             var instance = new Either<int, string>("test");
-            var result = instance.FromLeft(() => 1);
+            var result = instance.LeftOrDefault(() => 1);
             Assert.AreEqual(1, result);
         }
 
@@ -49,19 +87,19 @@ namespace Monadicsh.Tests
         public void TestFromLeftFuncArgumentNull()
         {
             Assert.Throws<ArgumentNullException>(() =>
-                default(Either<int, string>).FromLeft(() => 1));
+                default(Either<int, string>).LeftOrDefault(() => 1));
 
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).FromLeft(default(Func<int>)));
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).LeftOrDefault(default(Func<int>)));
 
             var instance = new Either<int, string>(1);
-            Assert.Throws<ArgumentNullException>(() => instance.FromLeft(default(Func<int>)));
+            Assert.Throws<ArgumentNullException>(() => instance.LeftOrDefault(default(Func<int>)));
         }
 
         [Test]
         public void TestFromRight()
         {
             var instance = new Either<int, TimeSpan>(TimeSpan.FromDays(1));
-            var result = instance.FromRight(TimeSpan.FromDays(0));
+            var result = instance.RightOrDefault(TimeSpan.FromDays(0));
             Assert.AreEqual(TimeSpan.FromDays(1), result);
         }
 
@@ -69,21 +107,21 @@ namespace Monadicsh.Tests
         public void TestFromRightDefaultValue()
         {
             var instance = new Either<int, TimeSpan>(1);
-            var result = instance.FromRight(TimeSpan.FromDays(1));
+            var result = instance.RightOrDefault(TimeSpan.FromDays(1));
             Assert.AreEqual(TimeSpan.FromDays(1), result);
         }
 
         [Test]
         public void TestFromRightArgumentNull()
         {
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).FromRight("test"));
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrDefault("test"));
         }
 
         [Test]
         public void TestFromRightFunc()
         {
             var instance = new Either<int, TimeSpan>(TimeSpan.FromDays(1));
-            var result = instance.FromRight(() => TimeSpan.FromDays(0));
+            var result = instance.RightOrDefault(() => TimeSpan.FromDays(0));
             Assert.AreEqual(TimeSpan.FromDays(1), result);
         }
 
@@ -91,24 +129,24 @@ namespace Monadicsh.Tests
         public void TestFromRightFuncDefaultValue()
         {
             var instance = new Either<int, TimeSpan>(1);
-            var result = instance.FromRight(() => TimeSpan.FromDays(1));
+            var result = instance.RightOrDefault(() => TimeSpan.FromDays(1));
             Assert.AreEqual(TimeSpan.FromDays(1), result);
         }
 
         [Test]
         public void TestFromRightFuncArgumentNull()
         {
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).FromRight(() => "test"));
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).FromRight(default(Func<string>)));
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrDefault(() => "test"));
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrDefault(default(Func<string>)));
             Assert.Throws<ArgumentNullException>(() =>
-                new Either<int, string>("test").FromRight(default(Func<string>)));
+                new Either<int, string>("test").RightOrDefault(default(Func<string>)));
         }
 
         [Test]
         public void TestMaybeLeftJust()
         {
             var instance = new Either<int, string>(1);
-            var result = instance.MaybeLeft();
+            var result = instance.LeftOrNothing();
             result.AssertJust(1);
         }
 
@@ -116,21 +154,21 @@ namespace Monadicsh.Tests
         public void TestMaybeLeftNothing()
         {
             var instance = new Either<int, string>("test");
-            var result = instance.MaybeLeft();
+            var result = instance.LeftOrNothing();
             result.AssertNothing();
         }
 
         [Test]
         public void TestMaybeLeftArgumentNull()
         {
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MaybeLeft());
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).LeftOrNothing());
         }
 
         [Test]
         public void TestMaybeRightJust()
         {
             var instance = new Either<int, string>("test");
-            var result = instance.MaybeRight();
+            var result = instance.RightOrNothing();
             result.AssertJust("test");
         }
 
@@ -138,14 +176,14 @@ namespace Monadicsh.Tests
         public void TestMaybeRightNothing()
         {
             var instance = new Either<int, string>(1);
-            var result = instance.MaybeRight();
+            var result = instance.RightOrNothing();
             result.AssertNothing();
         }
 
         [Test]
         public void TestMaybeRightArgumentNull()
         {
-            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MaybeRight());
+            Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrNothing());
         }
 
         [Test]

@@ -96,7 +96,7 @@ namespace Monadicsh
         /// be returned, otherwise <see cref="Maybe{T}.Nothing"/>.
         /// </summary>
         /// <param name="either">The either to extract the left side of.</param>
-        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.MaybeLeft();
+        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.LeftOrNothing();
 
         /// <summary>
         /// Implicitly creates an <see cref="Maybe{T}"/> of the right side of the given <paramref name="either"/>.
@@ -104,7 +104,7 @@ namespace Monadicsh
         /// be returned, otherwise <see cref="Maybe{T}.Nothing"/>.
         /// </summary>
         /// <param name="either">The either to extract the right side of.</param>
-        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.MaybeRight();
+        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.RightOrNothing();
 
         /// <summary>
         /// Returns a string representation of the current instance of <see cref="Either{T1,T2}"/>.

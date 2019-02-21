@@ -79,7 +79,7 @@ namespace Monadicsh.Extensions
         /// if the <paramref name="either"/> represents a right value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static Maybe<T1> MaybeLeft<T1, T2>(this Either<T1, T2> either)
+        public static Maybe<T1> LeftOrNothing<T1, T2>(this Either<T1, T2> either)
         {
             if (either == null)
             {
@@ -98,7 +98,7 @@ namespace Monadicsh.Extensions
         /// <param name="either">The either to extract the right value from.</param>
         /// <returns><see cref="Maybe{T}.Just(T)"/> of the right value or <see cref="Maybe{T}.Nothing"/> if the either represents a left value.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static Maybe<T2> MaybeRight<T1, T2>(this Either<T1, T2> either)
+        public static Maybe<T2> RightOrNothing<T1, T2>(this Either<T1, T2> either)
         {
             if (either == null)
             {
@@ -106,6 +106,29 @@ namespace Monadicsh.Extensions
             }
 
             return either.MapRight(Maybe<T2>.Nothing, Maybe.Just);
+        }
+
+        /// <summary>
+        /// Returns the left value of the given <paramref name="either"/> or the default value
+        /// of the type <typeparamref name="T1"/> if the <paramref name="either"/> is representing
+        /// a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <param name="either">The either to extract the left value of.</param>
+        /// <returns>
+        /// The left value of the given <paramref name="either"/> iff the either is representing
+        /// a default value. Otherwise the default value of <typeparamref name="T1"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static T1 LeftOrDefault<T1, T2>(this Either<T1, T2> either) where T1 : struct
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.LeftOrDefault(default(T1));
         }
 
         /// <summary>
@@ -121,14 +144,14 @@ namespace Monadicsh.Extensions
         /// if the <paramref name="either"/> is representing a right value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static T1 FromLeft<T1, T2>(this Either<T1, T2> either, T1 defaultValue)
+        public static T1 LeftOrDefault<T1, T2>(this Either<T1, T2> either, T1 defaultValue)
         {
             if (either == null)
             {
                 throw new ArgumentNullException(nameof(either));
             }
 
-            return either.FromLeft(() => defaultValue);
+            return either.LeftOrDefault(() => defaultValue);
         }
 
         /// <summary>
@@ -144,7 +167,7 @@ namespace Monadicsh.Extensions
         /// if the <paramref name="either"/> is representing a right value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="defaultValueSelector"/> is null.</exception>
-        public static T1 FromLeft<T1, T2>(this Either<T1, T2> either, Func<T1> defaultValueSelector)
+        public static T1 LeftOrDefault<T1, T2>(this Either<T1, T2> either, Func<T1> defaultValueSelector)
         {
             if (either == null)
             {
@@ -160,6 +183,28 @@ namespace Monadicsh.Extensions
         }
 
         /// <summary>
+        /// Returns the right value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T2"/> if the either is representing a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <param name="either">The either to extract the right value of.</param>
+        /// <returns>
+        /// The right value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T2"/> iff the either is representing a right value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static T2 RightOrDefault<T1, T2>(this Either<T1, T2> either) where T2 : struct
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.RightOrDefault(default(T2));
+        }
+
+        /// <summary>
         /// Returns the right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
         /// if the <paramref name="either"/> isn't representing a Right value.
         /// </summary>
@@ -172,14 +217,14 @@ namespace Monadicsh.Extensions
         /// if the <paramref name="either"/> is representing a left value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static T2 FromRight<T1, T2>(this Either<T1, T2> either, T2 defaultValue)
+        public static T2 RightOrDefault<T1, T2>(this Either<T1, T2> either, T2 defaultValue)
         {
             if (either == null)
             {
                 throw new ArgumentNullException(nameof(either));
             }
 
-            return either.FromRight(() => defaultValue);
+            return either.RightOrDefault(() => defaultValue);
         }
 
         /// <summary>
@@ -195,7 +240,7 @@ namespace Monadicsh.Extensions
         /// if the <paramref name="either"/> is representing a left value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="defaultValueSelector"/> is null.</exception>
-        public static T2 FromRight<T1, T2>(this Either<T1, T2> either, Func<T2> defaultValueSelector)
+        public static T2 RightOrDefault<T1, T2>(this Either<T1, T2> either, Func<T2> defaultValueSelector)
         {
             if (either == null)
             {
