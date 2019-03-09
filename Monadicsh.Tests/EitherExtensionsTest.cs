@@ -487,5 +487,23 @@ namespace Monadicsh.Tests
                 Assert.Throws<ArgumentNullException>(() => new Either<int, string>("test").DefaultIfLeft(null));
             }
         }
+
+        [Test]
+        public void TestReverse()
+        {
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.Reverse();
+                result.AssertRight(1);
+            }
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.Reverse();
+                result.AssertLeft("test");
+            }
+            {
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).Reverse());
+            }
+        }
     }
 }

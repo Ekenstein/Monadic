@@ -117,6 +117,42 @@ namespace Monadicsh.Tests
             Assert.AreNotEqual(instance3, instance4);
         }
 
+        [Test]
+        public void TestCastLeft()
+        {
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.CastLeft<int?>();
+                result.AssertLeft(1);
+            }
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.CastLeft<int?>();
+                result.AssertRight("test");
+            }
+            {
+                Assert.Throws<InvalidCastException>(() => new Either<string, int>("test").CastLeft<decimal>());
+            }
+        }
+
+        [Test]
+        public void TestCastRight()
+        {
+            {
+                var instance = new Either<string, int>(1);
+                var result = instance.CastRight<int?>();
+                result.AssertRight(1);
+            }
+            {
+                var instance = new Either<string, int>("test");
+                var result = instance.CastRight<int?>();
+                result.AssertLeft("test");
+            }
+            {
+                Assert.Throws<InvalidCastException>(() => new Either<int, string>("test").CastRight<decimal>());
+            }
+        }
+
         private class TestRef { }
     }
 }

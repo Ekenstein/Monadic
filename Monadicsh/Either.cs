@@ -77,6 +77,49 @@ namespace Monadicsh
         }
 
         /// <summary>
+        /// Returns a new either where the left value will be casted from <typeparamref name="T1"/>
+        /// to <typeparamref name="T3"/>.
+        /// </summary>
+        /// <typeparam name="T3">The type that the left should be casted to.</typeparam>
+        /// <returns>An <see cref="Either{T1, T2}"/> where the left side has been casted to <typeparamref name="T3"/>.</returns>
+        /// <exception cref="InvalidCastException">Left couldn't be casted to <typeparamref name="T3"/>.</exception>
+        public Either<T3, T2> CastLeft<T3>()
+        {
+            var maybeLeft = IsLeft
+                ? new [] { Left }
+                : Enumerable.Empty<T1>();
+
+            return maybeLeft
+                .Cast<T3>()
+                .Select(Maybe.Just)
+                .SingleOrDefault()
+                .AsEither(() => Right)
+                .Reverse();
+        }
+
+        /// <summary>
+        /// Returns a new either where the right value will be casted from <typeparamref name="T2"/>
+        /// to <typeparamref name="T3"/>.
+        /// </summary>
+        /// <typeparam name="T3">The type that the right value should be casted to.</typeparam>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> where the right side has been casted to <typeparamref name="T3"/>.
+        /// </returns>
+        /// <exception cref="InvalidCastException">Right couldn't be casted to <typeparamref name="T3"/>.</exception>
+        public Either<T1, T3> CastRight<T3>()
+        {
+            var maybeRight = IsRight
+                ? new [] { Right }
+                : Enumerable.Empty<T2>();
+
+            return maybeRight
+                .Cast<T3>()
+                .Select(Maybe.Just)
+                .SingleOrDefault()
+                .AsEither(() => Left);
+        }
+
+        /// <summary>
         /// Implicitly creates an <see cref="Either{T1,T2}"/> which will represent
         /// a left side with the given <paramref name="left"/> value.
         /// </summary>

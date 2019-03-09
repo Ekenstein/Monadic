@@ -652,5 +652,30 @@ namespace Monadicsh.Extensions
 
             return eithers.Partition().rights;
         }
+
+        /// <summary>
+        /// Returns a new <see cref="Either{T1, T2}"/> where the left value of the given
+        /// <paramref name="either"/> becomes the right value,
+        /// and the right value of the given <paramref name="either"/> becomes 
+        /// the left value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value that should become the right value.</typeparam>
+        /// <typeparam name="T2">The type of the right value that should become the left value.</typeparam>
+        /// <param name="either">The either to switch sides on.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> where the left value will be the right
+        /// value of the given <paramref name="either"/> and the right value will be
+        /// the left value of the given <paramref name="either"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static Either<T2, T1> Reverse<T1, T2>(this Either<T1, T2> either)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.MapEither(l => new Either<T2, T1>(l), r => new Either<T2, T1>(r));
+        }
     }
 }
