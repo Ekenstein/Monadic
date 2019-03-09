@@ -245,7 +245,7 @@ namespace Monadicsh.Tests
         public void TestOr()
         {
             var instance = Maybe.Just(1);
-            var value = instance.Or(0);
+            var value = instance.OrDefault(0);
             Assert.AreEqual(1, value);
         }
 
@@ -253,7 +253,7 @@ namespace Monadicsh.Tests
         public void TestOrNothing()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.Or(10);
+            var value = instance.OrDefault(10);
             Assert.AreEqual(10, value);
         }
 
@@ -261,7 +261,7 @@ namespace Monadicsh.Tests
         public void TestOrFunc()
         {
             var instance = Maybe.Just(1);
-            var value = instance.Or(() => 0);
+            var value = instance.OrDefault(() => 0);
             Assert.AreEqual(1, value);
         }
 
@@ -269,7 +269,7 @@ namespace Monadicsh.Tests
         public void TestOrFuncNothing()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.Or(() => 10);
+            var value = instance.OrDefault(() => 10);
             Assert.AreEqual(10, value);
         }
 

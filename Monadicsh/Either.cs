@@ -110,7 +110,7 @@ namespace Monadicsh
         /// Returns a string representation of the current instance of <see cref="Either{T1,T2}"/>.
         /// </summary>
         /// <returns>The string representation of the <see cref="Either{T1,T2}"/>.</returns>
-        public override string ToString() => this.FromEither(l => $"Left ({l})", r => $"Right ({r})");
+        public override string ToString() => this.MapEither(l => $"Left ({l})", r => $"Right ({r})");
 
         /// <inheritdoc />
         /// <summary>
@@ -160,7 +160,7 @@ namespace Monadicsh
         {
             unchecked
             {
-                return this.FromEither(l => l.GetHashCode() * 397, r => r.GetHashCode() * 397);
+                return this.MapEither(l => l.GetHashCode() * 397, r => r.GetHashCode() * 397);
             }
         }
     }

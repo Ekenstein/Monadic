@@ -21,7 +21,7 @@ namespace Monadicsh.Extensions
                 throw ex(result.Errors);
             }
         }
-
+        
         /// <summary>
         /// Ands together the inner <see cref="Result"/> with the
         /// outer <see cref="Result"/>. If one or both of the results' are

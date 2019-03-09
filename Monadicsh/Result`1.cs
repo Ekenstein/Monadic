@@ -81,7 +81,7 @@ namespace Monadicsh
         /// Returns a string representation of the current instance of <see cref="T:Monadicsh.Result`1" />.
         /// </summary>
         /// <returns>The string representation of the current instance of <see cref="T:Monadicsh.Result`1" />.</returns>
-        public override string ToString() => this.FromEither(
+        public override string ToString() => this.MapEither(
             fromL: l => l.ToString(),
             fromR: r => $"Success: ({r})");
     }

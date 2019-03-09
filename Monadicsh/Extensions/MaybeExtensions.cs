@@ -20,7 +20,7 @@ namespace Monadicsh.Extensions
         /// The value of the given <paramref name="maybe"/> iff the maybe contains a value. Otherwise the given
         /// <paramref name="defaultValue"/> will be returned.
         /// </returns>
-        public static T Or<T>(this Maybe<T> maybe, T defaultValue) => maybe.Or(() => defaultValue);
+        public static T OrDefault<T>(this Maybe<T> maybe, T defaultValue) => maybe.OrDefault(() => defaultValue);
 
         /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> if the maybe contains a value. Otherwise the value
@@ -34,7 +34,7 @@ namespace Monadicsh.Extensions
         /// produced by the given <paramref name="defaultValueSelector"/> will be returned.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null.</exception>
-        public static T Or<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
+        public static T OrDefault<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
 
         /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/> if the maybe
@@ -47,7 +47,7 @@ namespace Monadicsh.Extensions
         /// the maybe is representing Nothing.
         /// </returns>
         public static T OrDefault<T>(this Maybe<T> maybe) => maybe
-            .Or(() => default(T));
+            .OrDefault(() => default(T));
 
         /// <summary>
         /// Returns a <see cref="Maybe{T}"/> which will either represent the value
@@ -156,7 +156,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(exceptionSelector));
             }
 
-            return maybe.Or(() => throw exceptionSelector());
+            return maybe.OrDefault(() => throw exceptionSelector());
         }
 
         /// <summary>

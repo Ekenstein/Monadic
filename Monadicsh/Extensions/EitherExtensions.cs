@@ -35,7 +35,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(exceptionSelector));
             }
 
-            return either.FromEither(l => l, r => throw exceptionSelector(r));
+            return either.MapEither(l => l, r => throw exceptionSelector(r));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(exceptionSelector));
             }
 
-            return either.FromEither(l => throw exceptionSelector(l), r => r);
+            return either.MapEither(l => throw exceptionSelector(l), r => r);
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Monadicsh.Extensions
         /// a default value. Otherwise the default value of <typeparamref name="T1"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static T1 LeftOrDefault<T1, T2>(this Either<T1, T2> either) where T1 : struct
+        public static T1 LeftOrDefault<T1, T2>(this Either<T1, T2> either)
         {
             if (either == null)
             {
@@ -179,7 +179,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(defaultValueSelector));
             }
 
-            return either.FromEither(l => l, r => defaultValueSelector());
+            return either.MapEither(l => l, r => defaultValueSelector());
         }
 
         /// <summary>
@@ -252,7 +252,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(defaultValueSelector));
             }
 
-            return either.FromEither(l => defaultValueSelector(), r => r);
+            return either.MapEither(l => defaultValueSelector(), r => r);
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Monadicsh.Extensions
         /// <exception cref="ArgumentNullException">
         /// If <paramref name="either"/>, <paramref name="fromL"/> or <paramref name="fromR"/> are null.
         /// </exception>
-        public static T3 FromEither<T1, T2, T3>(this Either<T1, T2> either, Func<T1, T3> fromL, Func<T2, T3> fromR)
+        public static T3 MapEither<T1, T2, T3>(this Either<T1, T2> either, Func<T1, T3> fromL, Func<T2, T3> fromR)
         {
             if (either == null)
             {
@@ -396,7 +396,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(map));
             }
 
-            return either.FromEither(map, right => defaultValueSelector());
+            return either.MapEither(map, right => defaultValueSelector());
         }
 
         /// <summary>
@@ -464,7 +464,113 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(map));
             }
 
-            return either.FromEither(l => defaultValueSelector(), map);
+            return either.MapEither(l => defaultValueSelector(), map);
+        }
+
+        /// <summary>
+        /// Returns an <see cref="Either{T1, T2}"/> which will always represent a left value where the
+        /// left value is either the left value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T1"/> iff the <paramref name="either"/> represents a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <param name="either">The either where the left value will be extracted from.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> which will always represent a left value where the left
+        /// value is either the left value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T1"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static Either<T1, T2> DefaultIfRight<T1, T2>(this Either<T1, T2> either) where T1 : struct
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.DefaultIfRight(default(T1));
+        }
+
+        /// <summary>
+        /// Returns an <see cref="Either{T1, T2}"/> which will always represent a left value where the
+        /// left value is either the left value of the given <paramref name="either"/> or the given
+        /// <paramref name="defaultValue"/> iff the <paramref name="either"/> represents a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <param name="either">The either where the left value will be extracted from.</param>
+        /// <param name="defaultValue">The default value to use if the either represents a right value.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> which will always represent a left value where the left
+        /// value is either the left value of the given <paramref name="either"/> or the given <paramref name="defaultValue"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="defaultValue"/> are null.</exception>
+        public static Either<T1, T2> DefaultIfRight<T1, T2>(this Either<T1, T2> either, T1 defaultValue)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            if (defaultValue == null)
+            {
+                throw new ArgumentNullException(nameof(defaultValue));
+            }
+
+            return either.MapLeft(() => new Either<T1, T2>(defaultValue), left => new Either<T1, T2>(left));
+        }
+
+        /// <summary>
+        /// Returns an <see cref="Either{T1, T2}"/> which will always represent a right value where the
+        /// right value is either the right value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T2"/> iff the <paramref name="either"/> represents a left value.
+        /// </summary>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <param name="either">The either where the right value will be extracted from.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> which will always represent a right value where the right
+        /// value is either the right value of the given <paramref name="either"/> or the default value
+        /// of <typeparamref name="T2"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static Either<T1, T2> DefaultIfLeft<T1, T2>(this Either<T1, T2> either) where T2 : struct
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.DefaultIfLeft(default(T2));
+        }
+
+        /// <summary>
+        /// Returns an <see cref="Either{T1, T2}"/> which will always represent a right value where the
+        /// right value is either the right value of the given <paramref name="either"/> or the given
+        /// <paramref name="defaultValue"/> iff the <paramref name="either"/> represents a left value.
+        /// </summary>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <param name="either">The either where the left value will be extracted from.</param>
+        /// <param name="defaultValue">The default value to use if the either represents a right value.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> which will always represent a right value where the right
+        /// value is either the right value of the given <paramref name="either"/> or the given <paramref name="defaultValue"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="defaultValue"/> are null.</exception>
+        public static Either<T1, T2> DefaultIfLeft<T1, T2>(this Either<T1, T2> either, T2 defaultValue)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            if (defaultValue == null)
+            {
+                throw new ArgumentNullException(nameof(defaultValue));
+            }
+
+            return either.MapRight(() => new Either<T1, T2>(defaultValue), right => new Either<T1, T2>(right));
         }
             
 
