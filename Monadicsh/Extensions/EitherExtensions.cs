@@ -677,5 +677,51 @@ namespace Monadicsh.Extensions
 
             return either.MapEither(l => new Either<T2, T1>(l), r => new Either<T2, T1>(r));
         }
+
+        /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/> which will either be
+        /// empty or a singleton containing the left value of the given <paramref name="either"/>.
+        /// </summary>
+        /// <typeparam name="T1">The left type.</typeparam>
+        /// <typeparam name="T2">The right type.</typeparam>
+        /// <param name="either">The either to extract the left value from.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> which will contain the left value of the
+        /// given <paramref name="either"/> iff it represents a left value, otherwise
+        /// an empty collection will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static IEnumerable<T1> LeftOrEmpty<T1, T2>(this Either<T1, T2> either)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.MapLeft(Enumerable.Empty<T1>, l => new [] { l });
+        }
+
+        /// <summary>
+        /// Returns an <see cref="IEnumerable{T}"/> which will either be
+        /// empty or a singleton containing the right value of the given <paramref name="either"/>.
+        /// </summary>
+        /// <typeparam name="T1">The left type.</typeparam>
+        /// <typeparam name="T2">The right type.</typeparam>
+        /// <param name="either">The either to extract the right value from.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> which will contain the right value of the
+        /// given <paramref name="either"/> iff it represents a right value, otherwise
+        /// an empty collection will be returned.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
+        public static IEnumerable<T2> RightOrEmpty<T1, T2>(this Either<T1, T2> either)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            return either.MapRight(Enumerable.Empty<T2>, r => new [] { r });
+        }
     }
 }

@@ -505,5 +505,43 @@ namespace Monadicsh.Tests
                 Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).Reverse());
             }
         }
+
+        [Test]
+        public void TestLeftOrEmpty()
+        {
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.LeftOrEmpty().ToArray();
+                Assert.Contains(1, result);
+                Assert.AreEqual(1, result.Length);
+            }
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.LeftOrEmpty().ToArray();
+                Assert.IsEmpty(result);
+            }
+            {
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).LeftOrEmpty());
+            }
+        }
+
+        [Test]
+        public void TestRightOrEmpty()
+        {
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.RightOrEmpty().ToArray();
+                Assert.IsEmpty(result);
+            }
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.RightOrEmpty().ToArray();
+                Assert.Contains("test", result);
+                Assert.AreEqual(1, result.Length);
+            }
+            {
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrEmpty());
+            }
+        }
     }
 }

@@ -85,11 +85,9 @@ namespace Monadicsh
         /// <exception cref="InvalidCastException">Left couldn't be casted to <typeparamref name="T3"/>.</exception>
         public Either<T3, T2> CastLeft<T3>()
         {
-            var maybeLeft = IsLeft
-                ? new [] { Left }
-                : Enumerable.Empty<T1>();
-
-            return maybeLeft
+            var self = this;
+            return self
+                .LeftOrEmpty()
                 .Cast<T3>()
                 .Select(Maybe.Just)
                 .SingleOrDefault()
@@ -108,11 +106,9 @@ namespace Monadicsh
         /// <exception cref="InvalidCastException">Right couldn't be casted to <typeparamref name="T3"/>.</exception>
         public Either<T1, T3> CastRight<T3>()
         {
-            var maybeRight = IsRight
-                ? new [] { Right }
-                : Enumerable.Empty<T2>();
-
-            return maybeRight
+            var self = this;
+            return self
+                .RightOrEmpty()
                 .Cast<T3>()
                 .Select(Maybe.Just)
                 .SingleOrDefault()
