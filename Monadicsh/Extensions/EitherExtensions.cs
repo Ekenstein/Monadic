@@ -587,32 +587,22 @@ namespace Monadicsh.Extensions
         /// <see cref="Tuple{T1, T2}.Item2"/> is all the rights.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="eithers"/> is null.</exception>
-        public static (T1[] lefts, T2[] rights) Partition<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
+        public static (IEnumerable<T1> lefts, IEnumerable<T2> rights) Partition<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
         {
             if (eithers == null)
             {
                 throw new ArgumentNullException(nameof(eithers));
             }
 
-            var arr = eithers as Either<T1, T2>[] ?? eithers.ToArray();
-            if (!arr.Any())
-            {
-                return (new T1[0], new T2[0]);
-            }
-
-            return arr.Aggregate((new List<T1>(), new List<T2>()), (seed, either) =>
+            return eithers.Aggregate((Enumerable.Empty<T1>(), Enumerable.Empty<T2>()), (seed, either) =>
             {
                 if (either.IsLeft)
                 {
-                    seed.Item1.Add(either.Left);
+                    return (seed.Item1.Concat(new [] { either.Left }), seed.Item2);
                 }
-                else
-                {
-                    seed.Item2.Add(either.Right);   
-                }
-
-                return seed;
-            }, acc => (acc.Item1.ToArray(), acc.Item2.ToArray()));
+                
+                return (seed.Item1, seed.Item2.Concat(new [] { either.Right }));                
+            });
         }
 
         /// <summary>
@@ -624,7 +614,7 @@ namespace Monadicsh.Extensions
         /// <param name="eithers">The list of <see cref="Either{T1, T2}"/>.</param>
         /// <returns>All the left elements.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="eithers"/> is null.</exception>
-        public static T1[] Lefts<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
+        public static IEnumerable<T1> Lefts<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
         {
             if (eithers == null)
             {
@@ -643,7 +633,7 @@ namespace Monadicsh.Extensions
         /// <param name="eithers">The list of <see cref="Either{T1, T2}"/>.</param>
         /// <returns>All the right elements.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="eithers"/> is null.</exception>
-        public static T2[] Rights<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
+        public static IEnumerable<T2> Rights<T1, T2>(this IEnumerable<Either<T1, T2>> eithers)
         {
             if (eithers == null)
             {

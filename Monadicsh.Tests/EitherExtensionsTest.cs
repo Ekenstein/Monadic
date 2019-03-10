@@ -281,8 +281,8 @@ namespace Monadicsh.Tests
             var instance = new[] {either1, either2, either3, either4};
             var (lefts, rights) = instance.Partition();
 
-            Assert.AreEqual(2, lefts.Length);
-            Assert.AreEqual(2, rights.Length);
+            Assert.AreEqual(2, lefts.Count());
+            Assert.AreEqual(2, rights.Count());
             Assert.True(new [] {1,2}.SequenceEqual(lefts));
             Assert.True(new[] {"test", "test2"}.SequenceEqual(rights));
         }
@@ -292,8 +292,8 @@ namespace Monadicsh.Tests
         {
             var instance = new Either<int, string>[0];
             var (lefts, rights) = instance.Partition();
-            Assert.AreEqual(0, lefts.Length);
-            Assert.AreEqual(0, rights.Length);
+            Assert.AreEqual(0, lefts.Count());
+            Assert.AreEqual(0, rights.Count());
         }
 
         [Test]
@@ -316,7 +316,7 @@ namespace Monadicsh.Tests
             };
 
             var result = instance.Lefts();
-            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(2, result.Count());
             Assert.True(new [] {1,2}.SequenceEqual(result));
         }
 
@@ -325,7 +325,7 @@ namespace Monadicsh.Tests
         {
             var instance = new Either<int, string>[0];
             var result = instance.Lefts();
-            Assert.AreEqual(0, result.Length);
+            Assert.AreEqual(0, result.Count());
 
             instance = new[]
             {
@@ -334,7 +334,7 @@ namespace Monadicsh.Tests
             };
 
             result = instance.Lefts();
-            Assert.AreEqual(0, result.Length);
+            Assert.AreEqual(0, result.Count());
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace Monadicsh.Tests
             };
 
             var result = instance.Rights();
-            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(2, result.Count());
             Assert.True(new[] { "test", "test2" }.SequenceEqual(result));
         }
 
@@ -366,7 +366,7 @@ namespace Monadicsh.Tests
         {
             var instance = new Either<int, string>[0];
             var result = instance.Rights();
-            Assert.AreEqual(0, result.Length);
+            Assert.AreEqual(0, result.Count());
 
             instance = new[]
             {
@@ -375,7 +375,7 @@ namespace Monadicsh.Tests
             };
 
             result = instance.Rights();
-            Assert.AreEqual(0, result.Length);
+            Assert.AreEqual(0, result.Count());
         }
 
         [Test]
