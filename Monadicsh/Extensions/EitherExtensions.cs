@@ -698,7 +698,9 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(either));
             }
 
-            return either.MapLeft(Enumerable.Empty<T1>, l => new [] { l });
+            return either
+                .LeftOrNothing()
+                .AsEnumerable();
         }
 
         /// <summary>
@@ -721,7 +723,9 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(either));
             }
 
-            return either.MapRight(Enumerable.Empty<T2>, r => new [] { r });
+            return either
+                .RightOrNothing()
+                .AsEnumerable();
         }
     }
 }
