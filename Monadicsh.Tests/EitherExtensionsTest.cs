@@ -543,5 +543,45 @@ namespace Monadicsh.Tests
                 Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).RightOrEmpty());
             }
         }
+
+        [Test]
+        public void TestMapLeft()
+        {
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.MapLeft(v => $"{v}");
+                result.AssertLeft("1");
+            }
+            {
+                var instance = new Either<int, string>("test");
+                var result = instance.MapLeft(v => $"{v}");
+                result.AssertRight("test");
+            }
+            {
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MapLeft(v => v + 1));
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MapLeft(default(Func<int, string>)));
+                Assert.Throws<ArgumentNullException>(() => new Either<int, string>(1).MapLeft(default(Func<int, string>)));
+            }
+        }
+
+        [Test]
+        public void TestMapRight()
+        {
+            {
+                var instance = new Either<int, string>("1");
+                var result = instance.MapRight(s => int.Parse(s));
+                result.AssertRight(1);
+            }
+            {
+                var instance = new Either<int, string>(1);
+                var result = instance.MapRight(s => int.Parse(s));
+                result.AssertLeft(1);
+            }
+            {
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MapRight(v => v + 1));
+                Assert.Throws<ArgumentNullException>(() => default(Either<int, string>).MapRight(default(Func<string, int>)));
+                Assert.Throws<ArgumentNullException>(() => new Either<int, string>(1).MapRight(default(Func<string, int>)));
+            }
+        }
     }
 }

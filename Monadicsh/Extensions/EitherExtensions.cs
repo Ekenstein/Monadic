@@ -335,6 +335,107 @@ namespace Monadicsh.Extensions
             }
         }
 
+
+        /// <summary>
+        /// Returns a mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the <paramref name="either"/> isn't representing a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
+        /// <param name="either">The either which the right value should be extracted and mapped from.</param>
+        /// <param name="defaultValue">The default value to use if the either isn't representing a right value.</param>
+        /// <param name="map">The function that will map the right value to a new type.</param>
+        /// <returns>
+        /// Either the mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
+        /// if the given <paramref name="either"/> is representing a left value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="map"/> is null.</exception>
+        public static T3 MapRight<T1, T2, T3>(this Either<T1, T2> either, T3 defaultValue, Func<T2, T3> map)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            return either.MapRight(() => defaultValue, map);
+        }
+
+        /// <summary>
+        /// Maps the right value of the given <paramref name="either"/> to a new value
+        /// and returns an <see cref="Either{T1, T2}"/> which will contain either the mapped
+        /// right value or the left value of the given <paramref name="either"/>.
+        /// <typeparamref name="T3"/>.
+        /// </summary>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <typeparam name="T3">The type of the right value of the produced either.</typeparam>
+        /// <param name="either">The either to map the right value to a new value.</param>
+        /// <param name="map">The function mapping the right value to a new value.</param>
+        /// <returns>
+        /// An <see cref="Either{T1, T2}"/> where the left value will contain the left value of
+        /// the given <paramref name="either"/> and the right
+        /// value will be the right value of the given <paramref name="either"/> mapped to <typeparamref name="T3"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="map"/> is null.</exception>
+        public static Either<T1, T3> MapRight<T1, T2, T3>(this Either<T1, T2> either, Func<T2, T3> map)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            return either.MapEither(l => new Either<T1, T3>(l), r => new Either<T1, T3>(map(r)));
+        }
+
+        /// <summary>
+        /// Returns a mapped right value of the given <paramref name="either"/> or the value produced by the given
+        /// <paramref name="defaultValueSelector"/> iff the <paramref name="either"/> isn't representing a right value.
+        /// </summary>
+        /// <typeparam name="T1">The type of the left value.</typeparam>
+        /// <typeparam name="T2">The type of the right value.</typeparam>
+        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
+        /// <param name="either">The either which the right value should be extracted and mapped from.</param>
+        /// <param name="defaultValueSelector">The default value to use if the either isn't representing a right value.</param>
+        /// <param name="map">The function that will map the right value to a new type.</param>
+        /// <returns>
+        /// Either the mapped right value of the given <paramref name="either"/> or the value produced by the given
+        /// <paramref name="defaultValueSelector"/> iff the given <paramref name="either"/> is representing a left value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// If <paramref name="either"/>, <paramref name="defaultValueSelector"/> or <paramref name="map"/> is null.
+        /// </exception>
+        public static T3 MapRight<T1, T2, T3>(this Either<T1, T2> either, Func<T3> defaultValueSelector,
+            Func<T2, T3> map)
+        {
+            if (either == null)
+            {
+                throw new ArgumentNullException(nameof(either));
+            }
+
+            if (defaultValueSelector == null)
+            {
+                throw new ArgumentNullException(nameof(defaultValueSelector));
+            }
+
+            if (map == null)
+            {
+                throw new ArgumentNullException(nameof(map));
+            }
+
+            return either.MapEither(l => defaultValueSelector(), map);
+        }
+
         /// <summary>
         /// Returns a mapped left value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
         /// if the <paramref name="either"/> isn't representing a left value.
@@ -400,21 +501,22 @@ namespace Monadicsh.Extensions
         }
 
         /// <summary>
-        /// Returns a mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
-        /// if the <paramref name="either"/> isn't representing a right value.
+        /// Maps the left value of the given <paramref name="either"/> to a new value
+        /// and returns an <see cref="Either{T1, T2}"/> which will contain either the mapped
+        /// left value or the right value of the given <paramref name="either"/>.
         /// </summary>
-        /// <typeparam name="T1">The type of the left value.</typeparam>
-        /// <typeparam name="T2">The type of the right value.</typeparam>
-        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
-        /// <param name="either">The either which the right value should be extracted and mapped from.</param>
-        /// <param name="defaultValue">The default value to use if the either isn't representing a right value.</param>
-        /// <param name="map">The function that will map the right value to a new type.</param>
+        /// <typeparam name="T1">The type of left value.</typeparam>
+        /// <typeparam name="T2">The type of right value.</typeparam>
+        /// <typeparam name="T3">The type of the left value of the produced either.</typeparam>
+        /// <param name="either">The either to map the left value to a new value.</param>
+        /// <param name="map">The function mapping the left value to a new value.</param>
         /// <returns>
-        /// Either the mapped right value of the given <paramref name="either"/> or the <paramref name="defaultValue"/>
-        /// if the given <paramref name="either"/> is representing a left value.
+        /// An <see cref="Either{T1, T2}"/> where the left value will contain the left value of
+        /// the given <paramref name="either"/> mapped to <typeparamref name="T3"/> and the right
+        /// value will be the right value of the given <paramref name="either"/>.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> or <paramref name="map"/> is null.</exception>
-        public static T3 MapRight<T1, T2, T3>(this Either<T1, T2> either, T3 defaultValue, Func<T2, T3> map)
+        public static Either<T3, T2> MapLeft<T1, T2, T3>(this Either<T1, T2> either, Func<T1, T3> map)
         {
             if (either == null)
             {
@@ -426,45 +528,7 @@ namespace Monadicsh.Extensions
                 throw new ArgumentNullException(nameof(map));
             }
 
-            return either.MapRight(() => defaultValue, map);
-        }
-
-        /// <summary>
-        /// Returns a mapped right value of the given <paramref name="either"/> or the value produced by the given
-        /// <paramref name="defaultValueSelector"/> iff the <paramref name="either"/> isn't representing a right value.
-        /// </summary>
-        /// <typeparam name="T1">The type of the left value.</typeparam>
-        /// <typeparam name="T2">The type of the right value.</typeparam>
-        /// <typeparam name="T3">The type that the left value should be mapped to.</typeparam>
-        /// <param name="either">The either which the right value should be extracted and mapped from.</param>
-        /// <param name="defaultValueSelector">The default value to use if the either isn't representing a right value.</param>
-        /// <param name="map">The function that will map the right value to a new type.</param>
-        /// <returns>
-        /// Either the mapped right value of the given <paramref name="either"/> or the value produced by the given
-        /// <paramref name="defaultValueSelector"/> iff the given <paramref name="either"/> is representing a left value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// If <paramref name="either"/>, <paramref name="defaultValueSelector"/> or <paramref name="map"/> is null.
-        /// </exception>
-        public static T3 MapRight<T1, T2, T3>(this Either<T1, T2> either, Func<T3> defaultValueSelector,
-            Func<T2, T3> map)
-        {
-            if (either == null)
-            {
-                throw new ArgumentNullException(nameof(either));
-            }
-
-            if (defaultValueSelector == null)
-            {
-                throw new ArgumentNullException(nameof(defaultValueSelector));
-            }
-
-            if (map == null)
-            {
-                throw new ArgumentNullException(nameof(map));
-            }
-
-            return either.MapEither(l => defaultValueSelector(), map);
+            return either.MapEither(l => new Either<T3, T2>(map(l)), r => new Either<T3, T2>(r));
         }
 
         /// <summary>
