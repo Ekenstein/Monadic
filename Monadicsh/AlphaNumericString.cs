@@ -6,12 +6,12 @@ namespace Monadicsh
     /// <summary>
     /// A string that only contains alpha-numeric chars.
     /// </summary>
-    public struct AlphaNumericString : IEquatable<AlphaNumericString>
+    public struct AlphaNumericString : IEquatable<AlphaNumericString>, IString
     {
         /// <summary>
         /// The original string value. Can be null.
         /// </summary>
-        public string OriginalString { get; }
+        public string OriginalValue { get; }
 
         /// <summary>
         /// Converts the given string <paramref name="s"/>
