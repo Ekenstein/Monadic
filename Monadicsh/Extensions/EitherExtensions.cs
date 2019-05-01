@@ -194,7 +194,7 @@ namespace Monadicsh.Extensions
         /// of <typeparamref name="T2"/> iff the either is representing a right value.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="either"/> is null.</exception>
-        public static T2 RightOrDefault<T1, T2>(this Either<T1, T2> either) where T2 : struct
+        public static T2 RightOrDefault<T1, T2>(this Either<T1, T2> either)
         {
             if (either == null)
             {
