@@ -87,7 +87,7 @@ namespace Monadicsh
         {
             var self = this;
             return self
-                .LeftOrEmpty()
+                .GetLeftOrEmpty()
                 .Cast<T3>()
                 .Select(Maybe.Just)
                 .SingleOrDefault()
@@ -108,7 +108,7 @@ namespace Monadicsh
         {
             var self = this;
             return self
-                .RightOrEmpty()
+                .GetRightOrEmpty()
                 .Cast<T3>()
                 .Select(Maybe.Just)
                 .SingleOrDefault()
@@ -135,7 +135,7 @@ namespace Monadicsh
         /// be returned, otherwise <see cref="Maybe{T}.Nothing"/>.
         /// </summary>
         /// <param name="either">The either to extract the left side of.</param>
-        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.LeftOrNothing();
+        public static implicit operator Maybe<T1>(Either<T1, T2> either) => either.GetLeftOrNothing();
 
         /// <summary>
         /// Implicitly creates an <see cref="Maybe{T}"/> of the right side of the given <paramref name="either"/>.
@@ -143,7 +143,7 @@ namespace Monadicsh
         /// be returned, otherwise <see cref="Maybe{T}.Nothing"/>.
         /// </summary>
         /// <param name="either">The either to extract the right side of.</param>
-        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.RightOrNothing();
+        public static implicit operator Maybe<T2>(Either<T1, T2> either) => either.GetRightOrNothing();
 
         /// <summary>
         /// Returns a string representation of the current instance of <see cref="Either{T1,T2}"/>.

@@ -110,6 +110,6 @@ namespace Monadicsh.Extensions
         /// Otherwise the exception produced by the given <paramref name="exception"/> will be thrown.
         /// </returns>
         public static T OrThrow<T>(this Result<T> result, Func<IEnumerable<Error>, Exception> exception) => result
-            .RightOrThrow(l => exception(l.Errors));
+            .GetRightOrThrow(l => exception(l.Errors));
     }
 }

@@ -27,7 +27,7 @@ namespace Monadicsh
         /// The item of a successful validation result, or <see cref="Maybe{T}.Nothing"/> if the
         /// validation failed.
         /// </summary>
-        public Maybe<T> Item => this.RightOrNothing();
+        public Maybe<T> Item => this.GetRightOrNothing();
 
         private Result(Result left) : base(left)
         {
@@ -66,7 +66,7 @@ namespace Monadicsh
         /// Otherwise <see cref="Result.Success"/> will be returned.
         /// </summary>
         /// <param name="result">The result to create a <see cref="Result"/> of.</param>
-        public static implicit operator Result(Result<T> result) => result.LeftOrDefault(Result.Success);
+        public static implicit operator Result(Result<T> result) => result.GetLeftOrDefault(Result.Success);
 
         /// <summary>
         /// Returns a <see cref="Maybe{T}"/> representation of the given <paramref name="result"/>.

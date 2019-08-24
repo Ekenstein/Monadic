@@ -20,7 +20,7 @@ namespace Monadicsh.Extensions
         /// The value of the given <paramref name="maybe"/> iff the maybe contains a value. Otherwise the given
         /// <paramref name="defaultValue"/> will be returned.
         /// </returns>
-        public static T OrDefault<T>(this Maybe<T> maybe, T defaultValue) => maybe.OrDefault(() => defaultValue);
+        public static T GetValueOrDefault<T>(this Maybe<T> maybe, T defaultValue) => maybe.GetValueOrDefault(() => defaultValue);
 
         /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> if the maybe contains a value. Otherwise the value
@@ -34,7 +34,7 @@ namespace Monadicsh.Extensions
         /// produced by the given <paramref name="defaultValueSelector"/> will be returned.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> is null.</exception>
-        public static T OrDefault<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
+        public static T GetValueOrDefault<T>(this Maybe<T> maybe, Func<T> defaultValueSelector) => maybe.Map(defaultValueSelector, v => v);
 
         /// <summary>
         /// Returns the value of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/> if the maybe
@@ -46,8 +46,8 @@ namespace Monadicsh.Extensions
         /// The value of the given <paramref name="maybe"/> or the default value of <typeparamref name="T"/> if 
         /// the maybe is representing Nothing.
         /// </returns>
-        public static T OrDefault<T>(this Maybe<T> maybe) => maybe
-            .OrDefault(() => default(T));
+        public static T GetValueOrDefault<T>(this Maybe<T> maybe) => maybe
+            .GetValueOrDefault(() => default);
 
         /// <summary>
         /// Returns a <see cref="Maybe{T}"/> which will either represent the value
@@ -62,7 +62,7 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static Maybe<T> DefaultIfNothing<T>(this Maybe<T> maybe) where T : struct
         {
-            return maybe.DefaultIfNothing(default(T));
+            return maybe.DefaultIfNothing(default);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace Monadicsh.Extensions
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="defaultValueSelector"/> or <paramref name="map"/> is null.</exception>
         public static T2 Map<T1, T2>(this Maybe<T1> maybe, Func<T2> defaultValueSelector, Func<T1, T2> map)
-        {
+       {
             if (defaultValueSelector == null)
             {
                 throw new ArgumentNullException(nameof(defaultValueSelector));
@@ -149,14 +149,14 @@ namespace Monadicsh.Extensions
         /// by the <paramref name="exceptionSelector"/> will be thrown.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="exceptionSelector"/> is null.</exception>
-        public static T OrThrow<T>(this Maybe<T> maybe, Func<Exception> exceptionSelector)
+        public static T GetValueOrThrow<T>(this Maybe<T> maybe, Func<Exception> exceptionSelector)
         {
             if (exceptionSelector == null)
             {
                 throw new ArgumentNullException(nameof(exceptionSelector));
             }
 
-            return maybe.OrDefault(() => throw exceptionSelector());
+            return maybe.GetValueOrDefault(() => throw exceptionSelector());
         }
 
         /// <summary>
@@ -266,23 +266,8 @@ namespace Monadicsh.Extensions
         /// </returns>
         public static T? AsNullable<T>(this Maybe<T> maybe) where T : struct
         {
-            return maybe.Cast<T?>().OrDefault();
+            return maybe.Cast<T?>().GetValueOrDefault();
         }
-
-        /// <summary>
-        /// Returns a collection of type <typeparamref name="T"/> extracted from the maybes that contains
-        /// a value.
-        /// </summary>
-        /// <typeparam name="T">The type of the value that the maybe is holding.</typeparam>
-        /// <param name="maybes">The collection of maybes that will have their values extracted, if a value exists.</param>
-        /// <returns>
-        /// A collection of zero or more values of type <typeparamref name="T"/> that are extracted from the collection of
-        /// maybes where the maybe must contain a value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="maybes"/> is null.</exception>
-        public static IEnumerable<T> AllJust<T>(this IEnumerable<Maybe<T>> maybes) => maybes
-            .Where(m => m.IsJust)
-            .Select(m => m.Value);
 
         /// <summary>
         /// Checks whether the given <paramref name="value"/> is equal to the value of the <paramref name="maybe"/>.
@@ -316,6 +301,21 @@ namespace Monadicsh.Extensions
         /// <exception cref="ArgumentNullException">If the given <paramref name="equalityComparer"/> is null.</exception>
         public static bool Is<T>(this Maybe<T> maybe, T value, IEqualityComparer<T> equalityComparer) => maybe
             .Is(() => value, equalityComparer);
+
+        /// <summary>
+        /// Returns a flag indicating whether the value of the given <paramref name="maybe"/> satisfies
+        /// the given <paramref name="predicate"/>.
+        /// True if the value satisfies the <paramref name="predicate"/>, otherwise false if the maybe
+        /// represents Nothing or that its value doesn't satisfy the <paramref name="predicate"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
+        /// <param name="maybe">The maybe that contains either a value or nothing.</param>
+        /// <param name="predicate">The predicate to check whether the value of the maybe satisfies or not.</param>
+        /// <returns>
+        /// True if the value of the maybe satisfies the <paramref name="predicate"/>, otherwise false
+        /// if the value doesn't satisfy the <paramref name="predicate"/> or that the maybe is nothing.
+        /// </returns>
+        public static bool Is<T>(this Maybe<T> maybe, Func<T, bool> predicate) => maybe.Guard(predicate).IsJust;
 
         /// <summary>
         /// Checks whether produced value of the given <paramref name="valueSelector"/> is equal
@@ -602,65 +602,29 @@ namespace Monadicsh.Extensions
         }
 
         /// <summary>
-        /// Will perform one of the given functions depending on whether the <paramref name="maybe"/>
-        /// represents a value or nothing.
-        /// If the maybe represents a value, <paramref name="just"/> will be invoked with the value of
-        /// the maybe, otherwise <paramref name="nothing"/> will be invoked.
+        /// Returns the value of the given <paramref name="maybe"/> iff it contains a value,
+        /// otherwise the <paramref name="defaultValue"/> will be returned.
         /// </summary>
-        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
-        /// <param name="maybe">The maybe to perform either the just function or the nothing function on.</param>
-        /// <param name="just">The function that will be invoked if the maybe is representing a value.</param>
-        /// <param name="nothing">The function that will be invoked if the maybe is representing nothing.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="just"/> or <paramref name="nothing"/> is null.</exception>
-        public static void Case<T>(this Maybe<T> maybe, Action<T> just, Action nothing)
+        /// <typeparam name="T">The type the maybe is encapsulating</typeparam>
+        /// <param name="maybe">The maybe to return iff it contains a value.</param>
+        /// <param name="defaultValue">The default value to return if the <paramref name="maybe"/> doesn't represent a value.</param>
+        /// <returns>Either the given <paramref name="maybe"/> iff it contains a value, otherwise the given <paramref name="defaultValue"/>.</returns>
+        public static Maybe<T> Or<T>(this Maybe<T> maybe, Maybe<T> defaultValue)
         {
-            if (just == null)
-            {
-                throw new ArgumentNullException(nameof(just));
-            }
-
-            if (nothing == null)
-            {
-                throw new ArgumentNullException(nameof(nothing));
-            }
-
-            maybe.AsEither(() => 1).DoEither(_ => nothing(), v => just(v));
+            return maybe.Map(defaultValue, v => Maybe.Just(v));
         }
 
         /// <summary>
-        /// Invokes the given action <paramref name="just"/> iff the given <paramref name="maybe"/>
-        /// is representing a value.
+        /// Returns the value of the given <paramref name="maybe"/> iff it contains a value,
+        /// otherwise the <paramref name="defaultValue"/> will be returned.
         /// </summary>
-        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
-        /// <param name="maybe">The maybe to extract the value of and perform a function of.</param>
-        /// <param name="just">The function to invoke with the maybe's value.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="just"/> is null.</exception>
-        public static void CaseJust<T>(this Maybe<T> maybe, Action<T> just)
+        /// <typeparam name="T">The type the maybe is encapsulating</typeparam>
+        /// <param name="maybe">The maybe to return iff it contains a value.</param>
+        /// <param name="defaultValue">The default value to return if the <paramref name="maybe"/> doesn't represent a value.</param>
+        /// <returns>Either the given <paramref name="maybe"/> iff it contains a value, otherwise the given <paramref name="defaultValue"/>.</returns>
+        public static Maybe<T> Or<T>(this Maybe<T> maybe, Func<Maybe<T>> defaultValue)
         {
-            if (just == null)
-            {
-                throw new ArgumentNullException(nameof(just));
-            }
-
-            maybe.Case(just, () => { });
-        }
-
-        /// <summary>
-        /// Invokes the given action <paramref name="nothing"/> iff the given <paramref name="maybe"/>
-        /// is representing nothing.
-        /// </summary>
-        /// <typeparam name="T">The type of value the maybe is holding.</typeparam>
-        /// <param name="maybe">The maybe that may or may not represent a value.</param>
-        /// <param name="nothing">The function to invoke iff the maybe is representing nothing.</param>
-        /// <exception cref="ArgumentNullException">If <paramref name="nothing"/> is null.</exception>
-        public static void CaseNothing<T>(this Maybe<T> maybe, Action nothing)
-        {
-            if (nothing == null)
-            {
-                throw new ArgumentNullException(nameof(nothing));
-            }
-
-            maybe.Case(_ => { }, nothing);
+            return maybe.Map(defaultValue, v => v);
         }
 
         private class ComparableMaybe<T> : IComparable<Maybe<T>>

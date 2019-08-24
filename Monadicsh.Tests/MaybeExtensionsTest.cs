@@ -9,56 +9,6 @@ namespace Monadicsh.Tests
     public class MaybeExtensionsTest
     {
         [Test]
-        public void TestJustMixed()
-        {
-            var maybes = new[]
-            {
-                Maybe.Create(1),
-                Maybe<int>.Nothing
-            };
-
-            var result = maybes.AllJust().ToArray();
-            Assert.AreEqual(1, result.Length);
-            Assert.Contains(1, result);
-        }
-
-        [Test]
-        public void TestJustAllNothing()
-        {
-            var maybes = new[]
-            {
-                Maybe<int>.Nothing,
-                Maybe<int>.Nothing
-            };
-
-            var result = maybes.AllJust().ToArray();
-            Assert.IsEmpty(result);
-        }
-
-        [Test]
-        public void TestJustAllJust()
-        {
-            var maybes = new[]
-            {
-                Maybe.Create(1),
-                Maybe.Create(2)
-            };
-
-            var result = maybes.AllJust().ToArray();
-            Assert.AreEqual(2, result.Length);
-            Assert.Contains(1, result);
-            Assert.Contains(2, result);
-        }
-
-        [Test]
-        public void TestJustEmpty()
-        {
-            var maybes = new Maybe<int>[0];
-            var result = maybes.AllJust().ToArray();
-            Assert.IsEmpty(result);
-        }
-
-        [Test]
         public void TestAsNullableJust()
         {
             var instance = Maybe.Just(1);
@@ -176,7 +126,7 @@ namespace Monadicsh.Tests
         public void TestOrThrow()
         {
             var instance = Maybe.Just(1);
-            var value = instance.OrThrow(() => new Exception());
+            var value = instance.GetValueOrThrow(() => new Exception());
             Assert.AreEqual(1, value);
         }
 
@@ -184,17 +134,17 @@ namespace Monadicsh.Tests
         public void TestOrThrowNothing()
         {
             var instance = Maybe<int>.Nothing;
-            Assert.Throws<Exception>(() => instance.OrThrow(() => new Exception()));
+            Assert.Throws<Exception>(() => instance.GetValueOrThrow(() => new Exception()));
         }
 
         [Test]
         public void TestOrThrowFuncNull()
         {
             var instance = Maybe<int>.Nothing;
-            Assert.Throws<ArgumentNullException>(() => instance.OrThrow(default(Func<Exception>)));
+            Assert.Throws<ArgumentNullException>(() => instance.GetValueOrThrow(default(Func<Exception>)));
 
             instance = Maybe.Just(1);
-            Assert.Throws<ArgumentNullException>(() => instance.OrThrow(default(Func<Exception>)));
+            Assert.Throws<ArgumentNullException>(() => instance.GetValueOrThrow(default(Func<Exception>)));
         }
 
         [Test]
@@ -245,7 +195,7 @@ namespace Monadicsh.Tests
         public void TestOr()
         {
             var instance = Maybe.Just(1);
-            var value = instance.OrDefault(0);
+            var value = instance.GetValueOrDefault(0);
             Assert.AreEqual(1, value);
         }
 
@@ -253,7 +203,7 @@ namespace Monadicsh.Tests
         public void TestOrNothing()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.OrDefault(10);
+            var value = instance.GetValueOrDefault(10);
             Assert.AreEqual(10, value);
         }
 
@@ -261,7 +211,7 @@ namespace Monadicsh.Tests
         public void TestOrFunc()
         {
             var instance = Maybe.Just(1);
-            var value = instance.OrDefault(() => 0);
+            var value = instance.GetValueOrDefault(() => 0);
             Assert.AreEqual(1, value);
         }
 
@@ -269,7 +219,7 @@ namespace Monadicsh.Tests
         public void TestOrFuncNothing()
         {
             var instance = Maybe<int>.Nothing;
-            var value = instance.OrDefault(() => 10);
+            var value = instance.GetValueOrDefault(() => 10);
             Assert.AreEqual(10, value);
         }
 
@@ -422,7 +372,7 @@ namespace Monadicsh.Tests
         {
             var value = new TestRef(1);
             var instance = Maybe.Just(value);
-            var result = instance.OrDefault();
+            var result = instance.GetValueOrDefault();
             Assert.IsNotNull(result);
             Assert.AreEqual(value, result);
         }
@@ -431,7 +381,7 @@ namespace Monadicsh.Tests
         public void TestOrDefaultValueType()
         {
             var instance = Maybe.Just(1);
-            var result = instance.OrDefault();
+            var result = instance.GetValueOrDefault();
             Assert.AreEqual(1, result);
         }
 
@@ -439,7 +389,7 @@ namespace Monadicsh.Tests
         public void TestOrDefaultNothingReferenceType()
         {
             var instance = Maybe<TestRef>.Nothing;
-            var result = instance.OrDefault();
+            var result = instance.GetValueOrDefault();
             Assert.IsNull(result);
         }
 
@@ -447,7 +397,7 @@ namespace Monadicsh.Tests
         public void TestOrDefaultNothingValueType()
         {
             var instance = Maybe<int>.Nothing;
-            var result = instance.OrDefault();
+            var result = instance.GetValueOrDefault();
             Assert.AreEqual(default(int), result);
         }
 
@@ -685,59 +635,6 @@ namespace Monadicsh.Tests
 
             instance = default(Maybe<int>);
             Assert.IsEmpty(instance.AsEnumerable());
-        }
-
-        [Test]
-        public void TestCase()
-        {
-            {
-                var instance = Maybe.Just(1);
-                instance.Case(v => Assert.AreEqual(1, v), () => Assert.Fail("Nothing function was invoked even though the maybe is representing a value."));
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                instance.Case(v => Assert.Fail("Just function was invoked even though the maybe is representing nothing."), () => Assert.Pass());
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                Assert.Throws<ArgumentNullException>(() => instance.Case(default(Action<int>), default(Action)));
-                Assert.Throws<ArgumentNullException>(() => instance.Case(default(Action<int>), () => Assert.Fail()));
-                Assert.Throws<ArgumentNullException>(() => instance.Case(v => Assert.Fail(), default(Action)));
-            }
-        }
-
-        [Test]
-        public void TestCaseJust()
-        {
-            {
-                var instance = Maybe.Just(1);
-                instance.CaseJust(v => Assert.AreEqual(1, v));
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                instance.CaseJust(v => Assert.Fail());
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                Assert.Throws<ArgumentNullException>(() => instance.CaseJust(default(Action<int>)));
-            }
-        }
-
-        [Test]
-        public void TestCaseNothing()
-        {
-            {
-                var instance = Maybe.Just(1);
-                instance.CaseNothing(() => Assert.Fail());
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                instance.CaseNothing(() => Assert.Pass());
-            }
-            {
-                var instance = Maybe<int>.Nothing;
-                Assert.Throws<ArgumentNullException>(() => instance.CaseNothing(default(Action)));
-            }
         }
 
         private class TestEqualityComparer : IEqualityComparer<string>
